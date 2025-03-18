@@ -1,1 +1,39 @@
-.vscode
+# dependencies
+node_modules/
+.pnpm-store/
+
+# IDE
+/.idea
+/.awcache
+/.vscode
+*.code-workspace
+
+# bundle
+packages/**/*.d.ts
+packages/**/*.js
+
+# misc
+.DS_Store
+lerna-debug.log
+npm-debug.log
+yarn-error.log
+.env
+.env.*
+!.env.sample
+coverage
+.eslintcache
+
+# build
+build/
+dist/
+tmp/
+temp/
+
+# prisma
+prisma/migrations/
+.vercel
+
+# other
+.clinic
+.cache
+.npmrc

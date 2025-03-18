@@ -1,0 +1,8 @@
+{
+  "reject": [
+    "typescript"
+  ],
+  "packageManager": "pnpm",
+  "deep": true,
+  "upgrade": true
+} 

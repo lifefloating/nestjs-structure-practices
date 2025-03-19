@@ -8,6 +8,8 @@ import { contentParser } from 'fastify-multer';
 import compression from '@fastify/compress';
 import helmet from '@fastify/helmet';
 import fastifyCors from '@fastify/cors';
+import fastifySwagger from '@fastify/swagger';
+import fastifySwaggerUi from '@fastify/swagger-ui';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -20,9 +22,9 @@ async function bootstrap() {
 
   // Get application configuration
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('app.port');
-  const host = configService.get<string>('app.host');
-  const apiPrefix = configService.get<string>('app.apiPrefix');
+  const port = configService.get('app.port');
+  const host = configService.get('app.host');
+  const apiPrefix = configService.get('app.apiPrefix');
 
   // Setup global request validation
   app.useGlobalPipes(
@@ -37,7 +39,7 @@ async function bootstrap() {
   );
 
   // Setup API versioning
-  app.setGlobalPrefix(apiPrefix);
+  app.setGlobalPrefix(apiPrefix as string);
   app.enableVersioning({
     type: VersioningType.URI,
     defaultVersion: '1',
@@ -50,23 +52,35 @@ async function bootstrap() {
   await app.register(fastifyCors, configService.get('cors'));
 
   // Setup Swagger API documentation
-  if (configService.get<boolean>('swagger.enabled')) {
-    const swaggerConfig = configService.get('swagger');
+  if (configService.get('swagger.enabled')) {
+    // Generate Swagger OpenAPI document
     const options = new DocumentBuilder()
-      .setTitle(swaggerConfig.title)
-      .setDescription(swaggerConfig.description)
-      .setVersion(swaggerConfig.version)
+      .setTitle('NestJS Project API')
+      .setDescription('NestJS Project API documentation')
+      .setVersion('1.0')
       .addBearerAuth()
       .build();
 
     const document = SwaggerModule.createDocument(app, options);
-    SwaggerModule.setup(swaggerConfig.path, app, document);
 
-    logger.log(`Swagger documentation available at /${swaggerConfig.path}`);
+    // Register Fastify Swagger
+    await app.register(fastifySwagger, {
+      mode: 'static',
+      specification: {
+        document: document as any,
+      },
+    });
+
+    // Register Swagger UI
+    await app.register(fastifySwaggerUi, {
+      routePrefix: 'docs',
+    });
+
+    logger.log('Swagger documentation available at /docs');
   }
 
   // Start the application
-  await app.listen(port, host);
+  await app.listen(port ?? 3009, host ?? 'localhost');
   logger.log(`Application is running on: ${await app.getUrl()}`);
 }
 

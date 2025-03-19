@@ -1,6 +1,6 @@
 export default {
   app: {
-    name: process.env.APP_NAME || 'NestJS Structure Practices',
+    name: process.env.APP_NAME || 'Nest JS Project Template',
     description: process.env.APP_DESCRIPTION || 'NestJS template with best practices',
     version: process.env.API_VERSION || '1.0',
     port: parseInt(process.env.PORT || '3009', 10),

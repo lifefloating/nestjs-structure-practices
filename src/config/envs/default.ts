@@ -3,7 +3,7 @@ export default {
     name: process.env.APP_NAME || 'NestJS Structure Practices',
     description: process.env.APP_DESCRIPTION || 'NestJS template with best practices',
     version: process.env.API_VERSION || '1.0',
-    port: parseInt(process.env.PORT || '3000', 10),
+    port: parseInt(process.env.PORT || '3009', 10),
     host: process.env.HOST || 'localhost',
     apiPrefix: process.env.API_PREFIX || 'api',
   },

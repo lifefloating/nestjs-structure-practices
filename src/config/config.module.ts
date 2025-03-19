@@ -14,7 +14,7 @@ const configModuleOptions = {
   ],
   validationSchema: Joi.object({
     NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
-    PORT: Joi.number().default(3000),
+    PORT: Joi.number().default(3009),
     HOST: Joi.string().default('localhost'),
     API_PREFIX: Joi.string().default('api'),
     DATABASE_URL: Joi.string().required(),

@@ -30,7 +30,7 @@
     "url": "https://github.com/lifefloating"
   },
   "license": "MIT",
-  "packageManager": "pnpm@10.6.4",
+  "packageManager": "pnpm@10.6.5",
   "engines": {
     "node": ">=20.0.0"
   },

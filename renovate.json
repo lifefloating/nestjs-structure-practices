@@ -16,6 +16,11 @@
         "enabled": false
       },
       {
+        "matchPackagePatterns": ["^@nestjs/"],
+        "groupName": "nestjs packages",
+        "groupSlug": "nestjs"
+      },
+      {
         "matchUpdateTypes": ["minor", "patch"],
         "automerge": true
       }

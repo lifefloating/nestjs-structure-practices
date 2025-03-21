@@ -13,9 +13,19 @@
   <a href="https://www.mongodb.com/" target="_blank"><img src="https://img.shields.io/badge/database-MongoDB-green.svg" alt="Database" /></a>
 </p>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Aliyun-OSS-FF6A00?style=flat-square&logo=alibabacloud&logoColor=white" alt="Aliyun OSS" />
+  <img src="https://img.shields.io/badge/Tencent-COS-3399FF?style=flat-square&logo=tencentqq&logoColor=white" alt="Tencent COS" />
+  <img src="https://img.shields.io/badge/Amazon-S3-FF9900?style=flat-square&logo=amazons3&logoColor=white" alt="Amazon S3" />
+</p>
+
 ## Documentation
 
 - [Installation and Running Guide](./docs/install&run.md)
+- [Cloud Storage Integration Guide (Chinese)](./docs/storage-guide.md) | [English](./docs/storage-guide-en.md)
+
+## commit Doc
+
 - [Commit Convention](./COMMIT_CONVENTION.md)
 
 ## 📋 Tech Stack
@@ -30,6 +40,7 @@
 - **Logging**: [Pino](https://getpino.io/) for structured logging
 - **Testing**: [Jest](https://jestjs.io/)
 - **Linting**: [ESLint](https://eslint.org/) with TypeScript rules (inspired by [brocoders/nestjs-boilerplate](https://github.com/brocoders/nestjs-boilerplate))
+- **Storage**: Multi-cloud storage support ([Alibaba Cloud OSS](https://www.alibabacloud.com/product/object-storage-service), [Tencent Cloud COS](https://www.tencentcloud.com/products/cos), [Amazon S3](https://aws.amazon.com/s3/))
 
 ## Features
 
@@ -43,6 +54,7 @@
 - Unit and e2e testing setup
 - Performance optimized with Fastify and SWC
 - Git hooks with Husky and [conventional commits](./COMMIT_CONVENTION.md)
+- Unified cloud storage interface with multiple provider support
 
 ## Getting Started
 

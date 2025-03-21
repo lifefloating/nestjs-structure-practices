@@ -73,10 +73,10 @@ async function bootstrap() {
 
     // Register Swagger UI
     await app.register(fastifySwaggerUi, {
-      routePrefix: 'docs',
+      routePrefix: 'apidocs',
     });
 
-    logger.log('Swagger documentation available at /docs');
+    logger.log('Swagger documentation available at /apidocs');
   }
 
   // Start the application

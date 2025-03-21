@@ -161,6 +161,10 @@ pnpm test:e2e
 
 API documentation is available at `/docs` when the application is running. It provides an interactive interface to explore and test the API endpoints.
 
+## develop plan
+
+- [plan](https://github.com/lifefloating/nestjs-project-template/discussions/11)
+
 ## License
 
 [MIT](LICENSE)

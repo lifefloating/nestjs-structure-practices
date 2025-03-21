@@ -45,6 +45,18 @@ export interface DatabaseConfig {
   url: string;
 }
 
+export interface StorageConfig {
+  provider: 's3' | 'alioss' | 'tencentoss';
+  bucket: string;
+  region?: string;
+  endpoint?: string;
+  accessKeyId: string;
+  accessKeySecret: string;
+  baseUrl?: string;
+  maxFileSize: number; // use bytes
+  allowedMimeTypes: string[];
+}
+
 export interface Config {
   app: AppConfig;
   auth: AuthConfig;
@@ -52,4 +64,5 @@ export interface Config {
   swagger: SwaggerConfig;
   security: SecurityConfig;
   database: DatabaseConfig;
+  storage: StorageConfig;
 }

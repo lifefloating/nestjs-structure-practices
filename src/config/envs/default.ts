@@ -23,13 +23,26 @@ export default {
   },
   swagger: {
     enabled: true,
-    title: 'NestJS API',
-    description: 'NestJS API documentation',
-    version: '1.0',
-    path: 'docs',
+    title: 'NestJS Project Template API',
+    description: 'NestJS Project Template API documentation',
+    version: process.env.API_DOC_VERSION || '1.0.0',
+    path: 'apidoc',
   },
   security: {
     helmet: true,
     rateLimit: true,
+  },
+  storage: {
+    provider: process.env.STORAGE_PROVIDER || 's3',
+    bucket: process.env.STORAGE_BUCKET || 'my-bucket',
+    region: process.env.STORAGE_REGION || 'us-east-1',
+    endpoint: process.env.STORAGE_ENDPOINT || 's3.amazonaws.com',
+    accessKeyId: process.env.STORAGE_ACCESS_KEY_ID,
+    accessKeySecret: process.env.STORAGE_ACCESS_KEY_SECRET,
+    baseUrl: process.env.STORAGE_BASE_URL || '',
+    maxFileSize: parseInt(process.env.STORAGE_MAX_FILE_SIZE || '10485760', 10), // Default 10MB
+    allowedMimeTypes: (
+      process.env.STORAGE_ALLOWED_MIME_TYPES || 'image/jpeg,image/png,image/gif,application/pdf'
+    ).split(','),
   },
 };

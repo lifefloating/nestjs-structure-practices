@@ -4,6 +4,7 @@ import * as Joi from 'joi';
 import defaultConfig from './envs/default';
 import developmentConfig from './envs/development';
 import productionConfig from './envs/production';
+import { ConfigService } from './config.service';
 
 const configModuleOptions = {
   isGlobal: true,
@@ -22,6 +23,17 @@ const configModuleOptions = {
     JWT_EXPIRES_IN: Joi.string().default('30d'),
     JWT_REFRESH_SECRET: Joi.string().required(),
     JWT_REFRESH_EXPIRES_IN: Joi.string().default('90d'),
+    STORAGE_PROVIDER: Joi.string().valid('s3', 'alioss', 'tencentoss').default('s3'),
+    STORAGE_BUCKET: Joi.string().default('my-bucket'),
+    STORAGE_REGION: Joi.string().required(),
+    STORAGE_ENDPOINT: Joi.string().required(),
+    STORAGE_ACCESS_KEY_ID: Joi.string().required(),
+    STORAGE_ACCESS_KEY_SECRET: Joi.string().required(),
+    STORAGE_BASE_URL: Joi.string().optional(),
+    STORAGE_MAX_FILE_SIZE: Joi.number().default(10485760),
+    STORAGE_ALLOWED_MIME_TYPES: Joi.string().default(
+      'image/jpeg,image/png,image/gif,application/pdf',
+    ),
   }),
   validationOptions: {
     allowUnknown: true,
@@ -31,6 +43,7 @@ const configModuleOptions = {
 
 @Module({
   imports: [NestConfigModule.forRoot(configModuleOptions)],
-  exports: [NestConfigModule],
+  providers: [ConfigService],
+  exports: [NestConfigModule, ConfigService],
 })
 export class ConfigModule {}

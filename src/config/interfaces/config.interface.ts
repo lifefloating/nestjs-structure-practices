@@ -57,6 +57,12 @@ export interface StorageConfig {
   allowedMimeTypes: string[];
 }
 
+export interface DatdogConfig {
+  apiKey: string;
+  hostName?: string;
+  serviceName?: string;
+  intakeRegion: string;
+}
 export interface Config {
   app: AppConfig;
   auth: AuthConfig;
@@ -65,4 +71,5 @@ export interface Config {
   security: SecurityConfig;
   database: DatabaseConfig;
   storage: StorageConfig;
+  datadog: DatdogConfig;
 }

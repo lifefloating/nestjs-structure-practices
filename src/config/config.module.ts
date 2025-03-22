@@ -34,6 +34,10 @@ const configModuleOptions = {
     STORAGE_ALLOWED_MIME_TYPES: Joi.string().default(
       'image/jpeg,image/png,image/gif,application/pdf',
     ),
+    DATADOG_API_KEY: Joi.string().required(),
+    DATADOG_SERVICE_NAME: Joi.string().default('my-service'),
+    DATADOG_HOST_NAME: Joi.string().default('host-name'),
+    DATADOG_INTAKE_REGION: Joi.string().valid('us5', 'eu', 'us3').required(),
   }),
   validationOptions: {
     allowUnknown: true,

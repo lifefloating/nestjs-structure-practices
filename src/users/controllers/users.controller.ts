@@ -1,3 +1,4 @@
+import { LoggerService } from './../../logger/logger.service';
 import { Controller, Get, Post, Body, Param, Logger } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -8,7 +9,10 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 export class UsersController {
   private readonly logger = new Logger(UsersController.name);
 
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly loggerService: LoggerService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new user' })
@@ -24,7 +28,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'Return all users' })
   async findAll() {
-    this.logger.log('Finding all users');
+    this.loggerService.error('Finding all users', 'findAll');
     return this.usersService.findAll();
   }
 

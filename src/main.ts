@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
-import { ValidationPipe, VersioningType, Logger } from '@nestjs/common';
+import { VersioningType, Logger } from '@nestjs/common';
 import { ConfigService } from './config/config.service';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
@@ -10,6 +10,7 @@ import fastifyCors from '@fastify/cors';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import fastifyMultipart from '@fastify/multipart';
+import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -29,7 +30,7 @@ async function bootstrap() {
 
   // Setup global request validation
   app.useGlobalPipes(
-    new ValidationPipe({
+    new I18nValidationPipe({
       whitelist: true,
       transform: true,
       forbidNonWhitelisted: true,
@@ -38,7 +39,11 @@ async function bootstrap() {
       },
     }),
   );
-
+  app.useGlobalFilters(
+    new I18nValidationExceptionFilter({
+      detailedErrors: false,
+    }),
+  );
   // Setup API versioning
   app.setGlobalPrefix(apiPrefix as string);
   app.enableVersioning({

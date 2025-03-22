@@ -63,6 +63,7 @@
     "fastify": "^5.2.1",
     "fastify-multer": "^2.0.3",
     "joi": "^17.13.3",
+    "nestjs-i18n": "^10.5.1",
     "nestjs-pino": "^4.3.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",

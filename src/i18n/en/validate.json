@@ -1,0 +1,5 @@
+{
+    "email.required":"Please enter your email address",
+    "email.invalid":"Please enter a valid email address",
+    "password.minLength":"Password must be at least {minLength} characters"
+}

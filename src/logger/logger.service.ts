@@ -7,10 +7,8 @@ import { ConfigService } from '@app/config/config.service';
 export class LoggerService extends Logger {
   private readonly winstonLogger: winston.Logger;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(private readonly config: ConfigService) {
     super(); // 调用父类的构造函数
-
-    Logger.log('LoggerService constructor', this.configService.getDatadogConfig());
     const withErrorField = winston.format((info) => {
       if (info instanceof Error) {
         return Object.assign({}, info, {
@@ -25,6 +23,7 @@ export class LoggerService extends Logger {
       return info;
     });
     // 初始化 winston logger
+    const datadog = this.config.getDatadogConfig();
     this.winstonLogger = winston.createLogger({
       level: 'info', // 设置日志级别// 设置日志格式
       transports: [
@@ -37,12 +36,12 @@ export class LoggerService extends Logger {
           ),
         }),
         new DatadogTransport({
-          intakeRegion: 'us5',
-          apiKey: '',
-          hostname: '',
-          service: '',
+          intakeRegion: datadog.intakeRegion,
+          apiKey: datadog.apiKey,
+          hostname: datadog.hostName,
+          service: datadog.serviceName,
           ddsource: 'nginx',
-          ddtags: 'env:development',
+          ddtags: `env:${process.env.NODE_ENV}`,
         }),
       ],
     });

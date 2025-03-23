@@ -6,6 +6,7 @@ import developmentConfig from './envs/development';
 import productionConfig from './envs/production';
 import { ConfigService } from './config.service';
 
+// 修复 loadconfig 问题，由于相同key后面覆盖前面所以需要使用 defu 合并配置
 const configModuleOptions = {
   isGlobal: true,
   envFilePath: '.env',

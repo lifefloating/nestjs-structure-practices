@@ -6,6 +6,7 @@ import developmentConfig from './envs/development';
 import productionConfig from './envs/production';
 import { ConfigService } from './config.service';
 
+// 修复 loadconfig 问题，由于相同key后面覆盖前面所以需要使用 defu 合并配置
 const configModuleOptions = {
   isGlobal: true,
   envFilePath: '.env',
@@ -34,6 +35,10 @@ const configModuleOptions = {
     STORAGE_ALLOWED_MIME_TYPES: Joi.string().default(
       'image/jpeg,image/png,image/gif,application/pdf',
     ),
+    DATADOG_API_KEY: Joi.string().required(),
+    DATADOG_SERVICE_NAME: Joi.string().default('my-service'),
+    DATADOG_HOST_NAME: Joi.string().default('host-name'),
+    DATADOG_INTAKE_REGION: Joi.string().valid('us5', 'eu', 'us3').required(),
   }),
   validationOptions: {
     allowUnknown: true,

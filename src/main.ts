@@ -24,6 +24,7 @@ async function bootstrap() {
   // Get application configuration
   const configService = app.get(ConfigService);
   const appConfig = configService.getAppConfig();
+  logger.log(`Application configuration: ${JSON.stringify(appConfig)}`);
   const port = appConfig.port;
   const host = appConfig.host;
   const apiPrefix = appConfig.apiPrefix;

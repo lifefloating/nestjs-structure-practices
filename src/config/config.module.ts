@@ -6,15 +6,10 @@ import developmentConfig from './envs/development';
 import productionConfig from './envs/production';
 import { ConfigService } from './config.service';
 
-// 修复 loadconfig 问题，由于相同key后面覆盖前面所以需要使用 defu 合并配置
-const configModuleOptions = {
-  isGlobal: true,
-  envFilePath: '.env',
-  load: [
-    () => defaultConfig,
-    () => (process.env.NODE_ENV === 'production' ? productionConfig : developmentConfig),
-  ],
-  validationSchema: Joi.object({
+// Create different schemas based on environment
+const createSchemaForEnv = (isProd: boolean) => {
+  // Base schema for all environments
+  const baseSchema = {
     NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
     PORT: Joi.number().default(3009),
     HOST: Joi.string().default('localhost'),
@@ -35,11 +30,36 @@ const configModuleOptions = {
     STORAGE_ALLOWED_MIME_TYPES: Joi.string().default(
       'image/jpeg,image/png,image/gif,application/pdf',
     ),
-    DATADOG_API_KEY: Joi.string().required(),
-    DATADOG_SERVICE_NAME: Joi.string().default('my-service'),
-    DATADOG_HOST_NAME: Joi.string().default('host-name'),
-    DATADOG_INTAKE_REGION: Joi.string().valid('us5', 'eu', 'us3').required(),
-  }),
+  };
+
+  // Datadog schema varies by environment
+  if (isProd) {
+    return Joi.object({
+      ...baseSchema,
+      DATADOG_API_KEY: Joi.string().required(),
+      DATADOG_SERVICE_NAME: Joi.string().required(),
+      DATADOG_HOST_NAME: Joi.string().required(),
+      DATADOG_INTAKE_REGION: Joi.string().valid('us5', 'eu', 'us3').required(),
+    });
+  } else {
+    return Joi.object({
+      ...baseSchema,
+      DATADOG_API_KEY: Joi.string().optional().default('dummy-api-key'),
+      DATADOG_SERVICE_NAME: Joi.string().optional().default('my-service'),
+      DATADOG_HOST_NAME: Joi.string().optional().default('host-name'),
+      DATADOG_INTAKE_REGION: Joi.string().valid('us5', 'eu', 'us3').optional().default('us5'),
+    });
+  }
+};
+
+const configModuleOptions = {
+  isGlobal: true,
+  envFilePath: '.env',
+  load: [
+    () => defaultConfig,
+    () => (process.env.NODE_ENV === 'production' ? productionConfig : developmentConfig),
+  ],
+  validationSchema: createSchemaForEnv(process.env.NODE_ENV === 'production'),
   validationOptions: {
     allowUnknown: true,
     abortEarly: false,

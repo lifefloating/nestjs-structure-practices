@@ -1,3 +1,5 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { VersioningType, Logger } from '@nestjs/common';
@@ -98,7 +100,7 @@ async function bootstrap() {
   }
 
   // Start the application
-  await app.listen(port ?? 3009, host ?? 'localhost');
+  await app.listen(port ?? 7009, host ?? 'localhost');
   logger.log(`Application is running on: ${await app.getUrl()}`);
 }
 

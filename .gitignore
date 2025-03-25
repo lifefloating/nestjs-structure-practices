@@ -5,7 +5,6 @@ node_modules/
 # IDE
 /.idea
 /.awcache
-/.vscode
 *.code-workspace
 
 # bundle

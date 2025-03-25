@@ -16,9 +16,13 @@
         "groupSlug": "nestjs",
         "matchPackageNames": ["/^@nestjs//"]
       },
-    {
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true
-    }
-  ]
+      {
+        "matchUpdateTypes": ["minor", "patch"],
+        "automerge": true
+      },
+      {
+        "matchPackageNames": ["stripe"],
+        "enabled": false
+      }
+    ]
 }

@@ -86,3 +86,5 @@ pnpm test:e2e
 ## API Documentation
 
 API documentation is available at `/apidoc` when the application is running. It provides an interactive interface to explore and test the API endpoints.
+
+http://localhost:7009/apidoc#/

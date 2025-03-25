@@ -57,6 +57,13 @@ export interface StorageConfig {
   allowedMimeTypes: string[];
 }
 
+export interface StripeConfig {
+  secretKey: string;
+  publicKey: string;
+  webhookSecret: string;
+  apiVersion: string;
+}
+
 export interface DatdogConfig {
   apiKey: string;
   hostName?: string;
@@ -72,4 +79,5 @@ export interface Config {
   database: DatabaseConfig;
   storage: StorageConfig;
   datadog: DatdogConfig;
+  stripe: StripeConfig;
 }

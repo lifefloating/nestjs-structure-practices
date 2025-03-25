@@ -30,6 +30,7 @@ async function bootstrap() {
   const port = appConfig.port;
   const host = appConfig.host;
   const apiPrefix = appConfig.apiPrefix;
+  const swaggerConfig = configService.getSwaggerConfig();
 
   // Setup global request validation
   app.useGlobalPipes(
@@ -48,7 +49,9 @@ async function bootstrap() {
     }),
   );
   // Setup API versioning
-  app.setGlobalPrefix(apiPrefix as string);
+  app.setGlobalPrefix(apiPrefix as string, {
+    exclude: swaggerConfig?.path ? [swaggerConfig.path] : [],
+  });
   app.enableVersioning({
     type: VersioningType.URI,
     defaultVersion: '1',
@@ -69,14 +72,13 @@ async function bootstrap() {
   });
 
   // Setup Swagger API documentation
-  if (configService.getSwaggerConfig().enabled) {
-    const swaggerConfig = configService.getSwaggerConfig();
-    const apiDocVersion = process.env.API_DOC_VERSION || swaggerConfig.version || '1.0.0';
+  if (swaggerConfig?.enabled) {
+    const apiDocVersion = process.env.API_DOC_VERSION || swaggerConfig?.version || '1.0.0';
 
     // Generate Swagger OpenAPI document
     const options = new DocumentBuilder()
-      .setTitle(swaggerConfig.title)
-      .setDescription(swaggerConfig.description)
+      .setTitle(swaggerConfig?.title || 'API Documentation')
+      .setDescription(swaggerConfig?.description || 'API Documentation Description')
       .addBearerAuth()
       .setVersion(apiDocVersion)
       .build();
@@ -93,10 +95,10 @@ async function bootstrap() {
 
     // Register Swagger UI
     await app.register(fastifySwaggerUi, {
-      routePrefix: swaggerConfig.path,
+      routePrefix: swaggerConfig?.path || 'apidoc',
     });
 
-    logger.log('Swagger documentation available at /apidoc');
+    logger.log(`Swagger documentation available at /${swaggerConfig?.path || 'apidoc'}`);
   }
 
   // Start the application

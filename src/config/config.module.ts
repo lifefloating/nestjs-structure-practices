@@ -30,6 +30,10 @@ const createSchemaForEnv = (isProd: boolean) => {
     STORAGE_ALLOWED_MIME_TYPES: Joi.string().default(
       'image/jpeg,image/png,image/gif,application/pdf',
     ),
+    STRIPE_SECRET_KEY: Joi.string().required(),
+    STRIPE_PUBLIC_KEY: Joi.string().required(),
+    STRIPE_WEBHOOK_SECRET: Joi.string().required(),
+    STRIPE_API_VERSION: Joi.string().required(),
   };
 
   // Datadog schema varies by environment

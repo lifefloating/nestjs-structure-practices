@@ -51,4 +51,10 @@ export default {
     hostName: process.env.DATADOG_HOST_NAME || 'host-name',
     intakeRegion: process.env.DATADOG_INTAKE_REGION || 'us5',
   },
+  stripe: {
+    secretKey: process.env.STRIPE_SECRET_KEY,
+    publicKey: process.env.STRIPE_PUBLIC_KEY,
+    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+    apiVersion: process.env.STRIPE_API_VERSION || '2025-02-24.acacia',
+  },
 };

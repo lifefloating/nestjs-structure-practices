@@ -11,7 +11,7 @@ const createSchemaForEnv = (isProd: boolean) => {
   // Base schema for all environments
   const baseSchema = {
     NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
-    PORT: Joi.number().default(3009),
+    PORT: Joi.number().default(7009),
     HOST: Joi.string().default('localhost'),
     API_PREFIX: Joi.string().default('api'),
     DATABASE_URL: Joi.string().required(),

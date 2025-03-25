@@ -10,8 +10,6 @@ import {
   AcceptLanguageResolver,
 } from 'nestjs-i18n';
 import path from 'path';
-import { AppService } from './app.service';
-import { AppController } from './app.controller';
 import { CommonModule } from './common/common.module';
 import { StorageModule } from './storage/storage.module';
 import { LoggerModule } from './logger/logger.module';
@@ -40,7 +38,7 @@ import { StripeModule } from './stripe/stripe.module';
     LoggerModule,
     StripeModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

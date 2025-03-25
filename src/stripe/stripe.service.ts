@@ -23,7 +23,7 @@ export class StripeService {
   constructor(private readonly config: ConfigService) {
     const stripeConfig = this.config.getStripeConfig();
     this.stripe = new Stripe(stripeConfig.secretKey, {
-      apiVersion: '2023-10-16',
+      apiVersion: stripeConfig.apiVersion as Stripe.LatestApiVersion,
     });
     this.logger.log('Stripe service initialized');
   }

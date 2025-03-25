@@ -55,6 +55,6 @@ export default {
     secretKey: process.env.STRIPE_SECRET_KEY,
     publicKey: process.env.STRIPE_PUBLIC_KEY,
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
-    apiVersion: process.env.STRIPE_API_VERSION || '2023-10-16',
+    apiVersion: process.env.STRIPE_API_VERSION || '2025-02-24.acacia',
   },
 };

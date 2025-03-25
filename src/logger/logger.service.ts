@@ -8,7 +8,7 @@ export class LoggerService extends Logger {
   private readonly winstonLogger: winston.Logger;
 
   constructor(private readonly config: ConfigService) {
-    super(); // 调用父类的构造函数
+    super();
     const withErrorField = winston.format((info) => {
       if (info instanceof Error) {
         return Object.assign({}, info, {
@@ -23,6 +23,7 @@ export class LoggerService extends Logger {
       return info;
     });
     // 初始化 winston logger
+    // TODO
     const datadog = this.config.getDatadogConfig();
     this.winstonLogger = winston.createLogger({
       level: 'info', // 设置日志级别// 设置日志格式

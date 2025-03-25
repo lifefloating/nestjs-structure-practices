@@ -15,6 +15,7 @@ import { AppController } from './app.controller';
 import { CommonModule } from './common/common.module';
 import { StorageModule } from './storage/storage.module';
 import { LoggerModule } from './logger/logger.module';
+import { GraphQLAppModule } from './graphql/graphql.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { LoggerModule } from './logger/logger.module';
     UsersModule,
     StorageModule.register(),
     LoggerModule,
+    GraphQLAppModule,
   ],
   controllers: [AppController],
   providers: [AppService],

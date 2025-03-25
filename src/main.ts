@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { VersioningType, Logger } from '@nestjs/common';
@@ -14,6 +17,7 @@ import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
+  logger.log(`PORT from environment: ${process.env.PORT}`);
 
   // Create Fastify-based NestJS application
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -54,7 +58,9 @@ async function bootstrap() {
 
   // Register Fastify plugins
   await app.register(compression);
-  await app.register(helmet);
+  await app.register(helmet, {
+    contentSecurityPolicy: false, // disable csp
+  });
   await app.register(fastifyCors, configService.getCorsConfig());
 
   // Register multipart plugin for file uploads with configuration from storage settings
@@ -98,7 +104,7 @@ async function bootstrap() {
   }
 
   // Start the application
-  await app.listen(port ?? 3009, host ?? 'localhost');
+  await app.listen(port ?? 7009, host ?? 'localhost');
   logger.log(`Application is running on: ${await app.getUrl()}`);
 }
 

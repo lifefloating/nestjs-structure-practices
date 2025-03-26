@@ -13,6 +13,7 @@ import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import fastifyMultipart from '@fastify/multipart';
 import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
+import { FastifyInstance } from 'fastify';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -57,18 +58,20 @@ async function bootstrap() {
     defaultVersion: '1',
   });
 
-  // Register Fastify plugins
-  await app.register(compression);
-  await app.register(helmet);
-  await app.register(fastifyCors, configService.getCorsConfig());
+  // cause fastify update, temp adapt
+  const fastifyInstance = app.getHttpAdapter().getInstance() as unknown as FastifyInstance;
+
+  await fastifyInstance.register(compression as any);
+  await fastifyInstance.register(helmet as any);
+  await fastifyInstance.register(fastifyCors as any, configService.getCorsConfig());
 
   // Register multipart plugin for file uploads with configuration from storage settings
-  await app.register(fastifyMultipart, {
+  await fastifyInstance.register(fastifyMultipart as any, {
     limits: {
       fileSize: configService.getStorageConfig().maxFileSize,
-      files: 1, // Limit to one file per request by default
+      files: 1,
     },
-    attachFieldsToBody: false, // Don't automatically attach fields to body
+    attachFieldsToBody: false,
   });
 
   // Setup Swagger API documentation
@@ -86,7 +89,7 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, options);
 
     // Register Fastify Swagger
-    await app.register(fastifySwagger, {
+    await fastifyInstance.register(fastifySwagger as any, {
       mode: 'static',
       specification: {
         document: document as any,
@@ -94,7 +97,7 @@ async function bootstrap() {
     });
 
     // Register Swagger UI
-    await app.register(fastifySwaggerUi, {
+    await fastifyInstance.register(fastifySwaggerUi as any, {
       routePrefix: swaggerConfig?.path || 'apidoc',
     });
 
@@ -103,7 +106,13 @@ async function bootstrap() {
 
   // Start the application
   await app.listen(port ?? 7009, host ?? 'localhost');
-  logger.log(`Application is running on: ${await app.getUrl()}`);
+  const appUrl = await app.getUrl();
+  logger.log(`Application is running on: ${appUrl}`);
+
+  if (swaggerConfig?.enabled) {
+    const swaggerPath = swaggerConfig?.path || 'apidoc';
+    logger.log(`Swagger API documentation available at: ${appUrl}/${swaggerPath}`);
+  }
 }
 
 bootstrap().catch((err) => {

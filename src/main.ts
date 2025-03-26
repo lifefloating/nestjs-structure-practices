@@ -33,6 +33,15 @@ async function bootstrap() {
   const apiPrefix = appConfig.apiPrefix;
   const swaggerConfig = configService.getSwaggerConfig();
 
+  app.setGlobalPrefix(apiPrefix as string, {
+    exclude: swaggerConfig?.path ? [swaggerConfig.path] : [],
+  });
+
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+  });
+
   // Setup global request validation
   app.useGlobalPipes(
     new I18nValidationPipe({
@@ -49,15 +58,6 @@ async function bootstrap() {
       detailedErrors: false,
     }),
   );
-  // Setup API versioning
-  app.setGlobalPrefix(apiPrefix as string, {
-    exclude: swaggerConfig?.path ? [swaggerConfig.path] : [],
-  });
-  app.enableVersioning({
-    type: VersioningType.URI,
-    defaultVersion: '1',
-  });
-
   // cause fastify update, temp adapt
   const fastifyInstance = app.getHttpAdapter().getInstance() as unknown as FastifyInstance;
 

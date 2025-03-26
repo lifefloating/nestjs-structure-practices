@@ -1,12 +1,6 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
-  Logger,
-} from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
+import { LoggerService } from '../../logger/logger.service';
 
 interface ErrorResponse {
   statusCode: number;
@@ -18,7 +12,7 @@ interface ErrorResponse {
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-  private readonly logger = new Logger(HttpExceptionFilter.name);
+  constructor(private readonly loggerService: LoggerService) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
@@ -54,12 +48,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
     };
 
     if (status >= 500) {
-      this.logger.error(
+      this.loggerService.error(
         `${request.method} ${request.url}`,
-        exception instanceof Error ? exception.stack : exception,
+        exception instanceof Error
+          ? exception.stack || 'No stack trace'
+          : JSON.stringify(exception),
       );
     } else {
-      this.logger.warn(`${request.method} ${request.url} - ${JSON.stringify(responseBody)}`);
+      this.loggerService.warn(`${request.method} ${request.url} - ${JSON.stringify(responseBody)}`);
     }
 
     reply.status(status).send(responseBody);

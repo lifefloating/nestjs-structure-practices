@@ -37,11 +37,11 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.774.0",
-    "@aws-sdk/lib-storage": "^3.774.0",
-    "@aws-sdk/s3-request-presigner": "^3.774.0",
+    "@aws-sdk/client-s3": "^3.775.0",
+    "@aws-sdk/lib-storage": "^3.775.0",
+    "@aws-sdk/s3-request-presigner": "^3.775.0",
     "@fastify/compress": "^8.0.1",
-    "@fastify/cors": "^11.0.0",
+    "@fastify/cors": "^11.0.1",
     "@fastify/helmet": "^13.0.1",
     "@fastify/multipart": "^9.0.3",
     "@fastify/swagger": "^9.4.2",
@@ -59,9 +59,8 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cos-nodejs-sdk-v5": "^2.14.7",
-    "datadog-winston": "^1.6.0",
     "dotenv": "^16.4.7",
-    "fastify": "^5.2.1",
+    "fastify": "^5.2.2",
     "fastify-multer": "^2.0.3",
     "joi": "^17.13.3",
     "nestjs-i18n": "^10.5.1",
@@ -75,9 +74,7 @@
     "rimraf": "^6.0.1",
     "rxjs": "^7.8.2",
     "stripe": "^17.7.0",
-    "swagger-ui-express": "^5.0.1",
-    "uuid": "^11.1.0",
-    "winston": "^3.17.0"
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
@@ -90,7 +87,6 @@
     "@swc/cli": "^0.6.0",
     "@swc/core": "^1.11.13",
     "@types/ali-oss": "^6.16.11",
-    "@types/datadog-winston": "^1.0.7",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.13",
     "@types/passport-jwt": "^4.0.1",

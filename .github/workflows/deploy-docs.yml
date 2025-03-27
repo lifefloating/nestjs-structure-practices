@@ -49,7 +49,9 @@ jobs:
             ${{ runner.os }}-pnpm-store-
       
       - name: Install dependencies
-        run: pnpm install
+        run: |
+          pnpm install
+          pnpm add -g markdown-to-html-cli@5.0.3
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -129,7 +131,8 @@ jobs:
           
           # Process each markdown file
           for file in docs/*.md; do
-            filename=$(basename "$file" .md)
+            # 处理文件名，替换特殊字符
+            filename=$(basename "$file" .md | sed 's/[&]/-/g')
             title=$(head -n 1 "$file" | sed 's/^# //')
             if [ -z "$title" ]; then
               title=$filename
@@ -139,10 +142,12 @@ jobs:
             echo "<li><a href='./${filename}.html'>$title</a></li>" >> ./_site/index.html
             
             # Convert markdown to HTML with style
-            npx markdown-to-html-cli "$file" -o "./_site/${filename}.html" --style-sheet './styles.css' --document-title "$title"
+            markdown-to-html-cli "$file" -o "./_site/${filename}.html" --style-sheet './styles.css' --document-title "$title"
             
             # Add navigation back to index
-            sed -i '/<body>/a <div class="header"><a href="./index.html">← Back to Documentation Index</a></div>' "./_site/${filename}.html"
+            if [ -f "./_site/${filename}.html" ]; then
+              sed -i '/<body>/a <div class="header"><a href="./index.html">← Back to Documentation Index</a></div>' "./_site/${filename}.html"
+            fi
           done
           
           # Close index HTML

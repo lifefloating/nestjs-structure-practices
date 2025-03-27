@@ -1,0 +1,151 @@
+name: Deploy Documentation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm install -g markdown-to-html-cli
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      
+      - name: Create output directory
+        run: mkdir -p ./_site
+      
+      - name: Create styles
+        run: |
+          cat > ./_site/styles.css << 'EOF'
+          body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+          }
+          a {
+            color: #0066cc;
+            text-decoration: none;
+          }
+          a:hover {
+            text-decoration: underline;
+          }
+          h1, h2, h3 {
+            color: #2c3e50;
+          }
+          pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+          }
+          code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f5f5f5;
+            padding: 2px 4px;
+            border-radius: 3px;
+          }
+          ul {
+            list-style-type: none;
+            padding: 0;
+          }
+          li {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+          }
+          .header {
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+          }
+          EOF
+      
+      - name: Convert markdown to HTML
+        run: |
+          # Create index page with styling
+          cat > ./_site/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>NestJS Project Documentation</title>
+            <link rel="stylesheet" href="./styles.css">
+          </head>
+          <body>
+            <div class="header">
+              <h1>NestJS Project Documentation</h1>
+              <p>Documentation for NestJS Project Structure Template</p>
+            </div>
+            <ul>
+          EOF
+          
+          # Process each markdown file
+          for file in docs/*.md; do
+            filename=$(basename "$file" .md)
+            title=$(head -n 1 "$file" | sed 's/^# //')
+            if [ -z "$title" ]; then
+              title=$filename
+            fi
+            
+            # Add to index
+            echo "<li><a href='./${filename}.html'>$title</a></li>" >> ./_site/index.html
+            
+            # Convert markdown to HTML with style
+            markdown-to-html-cli "$file" -o "./_site/${filename}.html" --style-sheet './styles.css' --document-title "$title"
+            
+            # Add navigation back to index
+            sed -i '/<body>/a <div class="header"><a href="./index.html">← Back to Documentation Index</a></div>' "./_site/${filename}.html"
+          done
+          
+          # Close index HTML
+          cat >> ./_site/index.html << 'EOF'
+            </ul>
+          </body>
+          </html>
+          EOF
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4 

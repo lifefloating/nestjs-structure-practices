@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: nestjs-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "7009:7009"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=mongodb://mongodb:27017/nestjs_practice
+      - PORT=7009
+      - HOST=0.0.0.0
+    depends_on:
+      - mongodb
+    networks:
+      - nestjs-network
+    volumes:
+      - ./.env:/app/.env
+      - app-logs:/app/logs
+
+  mongodb:
+    container_name: mongodb
+    image: mongo:7.0
+    restart: always
+    environment:
+      - MONGODB_DATABASE=nestjs_practice
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - nestjs-network
+    command: mongod --quiet --logpath /dev/null
+
+networks:
+  nestjs-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:
+    driver: local
+  app-logs:
+    driver: local 

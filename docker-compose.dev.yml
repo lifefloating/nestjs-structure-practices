@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  mongodb:
+    container_name: mongodb-dev
+    image: mongo:7.0
+    restart: always
+    environment:
+      - MONGODB_DATABASE=nestjs_practice
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data-dev:/data/db
+    networks:
+      - nestjs-network-dev
+    command: mongod --quiet --logpath /dev/null
+
+networks:
+  nestjs-network-dev:
+    driver: bridge
+
+volumes:
+  mongodb-data-dev:
+    driver: local 

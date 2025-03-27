@@ -106,9 +106,8 @@ jobs:
           mkdir -p swagger-static
           
           # Move the generated OpenAPI JSON file to the static directory
-          mv openapi.json swagger-static/swagger.json
+          cp openapi/openapi.yaml swagger-static/swagger.yaml
           
-          # Create index.html for Swagger UI
           cat > swagger-static/index.html << 'EOF'
           <!DOCTYPE html>
           <html lang="en">
@@ -132,7 +131,7 @@ jobs:
             <script>
               window.onload = function() {
                 window.ui = SwaggerUIBundle({
-                  url: "./swagger.json",
+                  url: "./swagger.yaml",
                   dom_id: '#swagger-ui',
                   deepLinking: true,
                   presets: [

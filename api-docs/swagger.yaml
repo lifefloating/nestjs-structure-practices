@@ -1,0 +1,271 @@
+openapi: 3.1.0
+paths:
+  /api/v1/users:
+    post:
+      operationId: UsersController_create_v1
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        '201':
+          description: User successfully created
+        '400':
+          description: Bad Request
+        '409':
+          description: User already exists
+      summary: Create a new user
+      tags: &ref_0
+        - users
+    get:
+      operationId: UsersController_findAll_v1
+      parameters: []
+      responses:
+        '200':
+          description: Return all users
+      summary: Get all users
+      tags: *ref_0
+  /api/v1/users/{id}:
+    get:
+      operationId: UsersController_findOne_v1
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: User ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return the user
+        '404':
+          description: User not found
+      summary: Get a user by ID
+      tags: *ref_0
+  /api/v1/storage/upload:
+    post:
+      operationId: StorageController_uploadFile_v1
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: File to upload
+      responses:
+        '201':
+          description: ''
+      summary: Upload a single file
+      tags: &ref_1
+        - storage
+  /api/v1/storage/{key}:
+    delete:
+      operationId: StorageController_deleteFile_v1
+      parameters:
+        - name: key
+          required: true
+          in: path
+          description: Unique identifier of the file
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      summary: Delete a file
+      tags: *ref_1
+  /api/v1/storage/{key}/url:
+    get:
+      operationId: StorageController_getFileUrl_v1
+      parameters:
+        - name: key
+          required: true
+          in: path
+          description: Unique identifier of the file
+          schema:
+            type: string
+        - name: expiresIn
+          required: false
+          in: query
+          description: Expiration time for URL (seconds)
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      summary: Get a signed URL for a file
+      tags: *ref_1
+  /api/v1/stripe/test:
+    get:
+      operationId: StripeController_test_v1
+      parameters: []
+      responses:
+        '200':
+          description: Stripe integration is working
+      summary: Test Stripe integration
+      tags: &ref_2
+        - stripe
+  /api/v1/stripe/payment-intents:
+    post:
+      operationId: StripeController_createPaymentIntent_v1
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentIntentDto'
+      responses:
+        '201':
+          description: Payment intent created successfully
+        '400':
+          description: Bad request
+      summary: Create a payment intent
+      tags: *ref_2
+  /api/v1/stripe/payment-intents/{id}:
+    get:
+      operationId: StripeController_retrievePaymentIntent_v1
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Payment intent ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Payment intent retrieved successfully
+        '404':
+          description: Payment intent not found
+      summary: Retrieve a payment intent
+      tags: *ref_2
+  /api/v1/stripe/customers:
+    post:
+      operationId: StripeController_createCustomer_v1
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerDto'
+      responses:
+        '201':
+          description: Customer created successfully
+        '400':
+          description: Bad request
+      summary: Create a customer
+      tags: *ref_2
+  /api/v1/stripe/setup-intents:
+    post:
+      operationId: StripeController_createSetupIntent_v1
+      parameters: []
+      responses:
+        '201':
+          description: Setup intent created successfully
+        '400':
+          description: Bad request
+      summary: Create a setup intent for a customer
+      tags: *ref_2
+  /api/v1/stripe/webhooks:
+    post:
+      operationId: StripeController_handleWebhook_v1
+      parameters:
+        - name: stripe-signature
+          required: true
+          in: header
+          description: Stripe webhook signature
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Webhook processed successfully
+        '400':
+          description: Invalid webhook signature
+      summary: Handle Stripe webhook events
+      tags: *ref_2
+info:
+  title: NestJS Project Template API
+  description: NestJS Project Template API documentation
+  version: 1.0.0
+  contact: {}
+tags: []
+servers: []
+components:
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+  schemas:
+    CreateUserDto:
+      type: object
+      properties:
+        email:
+          type: string
+          description: The email of the user
+          example: user@example.com
+        password:
+          type: string
+          description: The password of the user
+          example: Password123!
+          minLength: 8
+        firstName:
+          type: string
+          description: The first name of the user
+          example: John
+        lastName:
+          type: string
+          description: The last name of the user
+          example: Doe
+      required:
+        - email
+        - password
+    CreatePaymentIntentDto:
+      type: object
+      properties:
+        amount:
+          type: number
+          description: Amount in smallest currency unit (e.g., cents for USD)
+          example: 2000
+        currency:
+          type: string
+          description: Three-letter ISO currency code
+          example: usd
+        description:
+          type: string
+          description: Description of the payment intent
+          example: 'Payment for order #1234'
+        metadata:
+          type: object
+          description: Set of key-value pairs for additional information
+          example:
+            orderId: '1234'
+      required:
+        - amount
+        - currency
+    CreateCustomerDto:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Customer email address
+          example: customer@example.com
+        name:
+          type: string
+          description: Customer name
+          example: John Doe
+        metadata:
+          type: object
+          description: Set of key-value pairs for additional information
+          example:
+            userId: '1234'
+      required:
+        - email

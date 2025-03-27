@@ -11,6 +11,49 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      # App Environment
+      NODE_ENV: ${{ vars.NODE_ENV || 'development' }}
+      API_DOC_VERSION: ${{ vars.API_DOC_VERSION || '1.0.0' }}
+      PORT: ${{ vars.PORT || '7009' }}
+      HOST: ${{ vars.HOST || 'localhost' }}
+      API_PREFIX: ${{ vars.API_PREFIX || 'api' }}
+      APP_NAME: ${{ vars.APP_NAME || 'NestJS Project Template' }}
+      APP_DESCRIPTION: ${{ vars.APP_DESCRIPTION || 'NestJS template with best practices' }}
+      API_VERSION: ${{ vars.API_VERSION || '1.0' }}
+      OPEN_API_VERSION: ${{ vars.OPEN_API_VERSION || '3.1.0' }}
+      
+      # Database
+      DATABASE_URL: ${{ secrets.DATABASE_URL || 'mongodb://localhost:27017/nestjs_practice' }}
+      
+      # Auth
+      JWT_SECRET: ${{ secrets.JWT_SECRET || 'dummy-jwt-secret-for-swagger-generation' }}
+      JWT_EXPIRES_IN: ${{ vars.JWT_EXPIRES_IN || '30d' }}
+      JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET || 'dummy-jwt-refresh-secret-for-swagger-generation' }}
+      JWT_REFRESH_EXPIRES_IN: ${{ vars.JWT_REFRESH_EXPIRES_IN || '90d' }}
+      
+      # Storage
+      STORAGE_PROVIDER: ${{ vars.STORAGE_PROVIDER || 's3' }}
+      STORAGE_BUCKET: ${{ vars.STORAGE_BUCKET || 'my-bucket' }}
+      STORAGE_REGION: ${{ vars.STORAGE_REGION || 'us-east-1' }}
+      STORAGE_ENDPOINT: ${{ vars.STORAGE_ENDPOINT || 's3.us-east-1.amazonaws.com' }}
+      STORAGE_ACCESS_KEY_ID: ${{ secrets.STORAGE_ACCESS_KEY_ID || 'dummy-access-key-id' }}
+      STORAGE_ACCESS_KEY_SECRET: ${{ secrets.STORAGE_ACCESS_KEY_SECRET || 'dummy-access-key-secret' }}
+      STORAGE_BASE_URL: ${{ vars.STORAGE_BASE_URL || 'https://my-bucket.s3.us-east-1.amazonaws.com' }}
+      STORAGE_MAX_FILE_SIZE: ${{ vars.STORAGE_MAX_FILE_SIZE || '10485760' }}
+      STORAGE_ALLOWED_MIME_TYPES: ${{ vars.STORAGE_ALLOWED_MIME_TYPES || 'image/jpeg,image/png,image/gif,application/pdf' }}
+      
+      # Datadog
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY || 'dummy-datadog-api-key' }}
+      DATADOG_SERVICE_NAME: ${{ vars.DATADOG_SERVICE_NAME || 'nestjs-structure-practices' }}
+      DATADOG_HOST_NAME: ${{ vars.DATADOG_HOST_NAME || 'local-dev' }}
+      DATADOG_INTAKE_REGION: ${{ vars.DATADOG_INTAKE_REGION || 'us5' }}
+      
+      # Stripe
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || 'sk_test_dummy_secret_key' }}
+      STRIPE_PUBLIC_KEY: ${{ secrets.STRIPE_PUBLIC_KEY || 'pk_test_dummy_public_key' }}
+      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET || 'whsec_dummy_webhook_secret' }}
+      STRIPE_API_VERSION: ${{ vars.STRIPE_API_VERSION || '2025-02-24.acacia' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

@@ -17,20 +17,25 @@ export interface CreateCustomerDto {
 
 @Injectable()
 export class StripeService {
-  private readonly stripe: Stripe;
+  private stripe: Stripe;
   private readonly logger = new Logger(StripeService.name);
 
-  constructor(private readonly config: ConfigService) {
-    const stripeConfig = this.config.getStripeConfig();
-    this.stripe = new Stripe(stripeConfig.secretKey, {
-      apiVersion: stripeConfig.apiVersion as Stripe.LatestApiVersion,
-    });
-    this.logger.log('Stripe service initialized');
+  constructor(private readonly config: ConfigService) {}
+
+  private getStripe(): Stripe {
+    if (!this.stripe) {
+      const stripeConfig = this.config.getStripeConfig();
+      this.stripe = new Stripe(stripeConfig.secretKey, {
+        apiVersion: stripeConfig.apiVersion as Stripe.LatestApiVersion,
+      });
+      this.logger.log('Stripe service initialized');
+    }
+    return this.stripe;
   }
 
   async createPaymentIntent(data: CreatePaymentIntentDto): Promise<Stripe.PaymentIntent> {
     try {
-      const paymentIntent = await this.stripe.paymentIntents.create({
+      const paymentIntent = await this.getStripe().paymentIntents.create({
         amount: data.amount,
         currency: data.currency,
         description: data.description,
@@ -45,7 +50,7 @@ export class StripeService {
 
   async retrievePaymentIntent(id: string): Promise<Stripe.PaymentIntent> {
     try {
-      return await this.stripe.paymentIntents.retrieve(id);
+      return await this.getStripe().paymentIntents.retrieve(id);
     } catch (error) {
       this.logger.error(`Failed to retrieve payment intent: ${error.message}`, error.stack);
       throw error;
@@ -54,7 +59,7 @@ export class StripeService {
 
   async createCustomer(data: CreateCustomerDto): Promise<Stripe.Customer> {
     try {
-      return await this.stripe.customers.create({
+      return await this.getStripe().customers.create({
         email: data.email,
         name: data.name,
         metadata: data.metadata,
@@ -67,7 +72,7 @@ export class StripeService {
 
   async createSetupIntent(customerId: string): Promise<Stripe.SetupIntent> {
     try {
-      return await this.stripe.setupIntents.create({
+      return await this.getStripe().setupIntents.create({
         customer: customerId,
         usage: 'off_session',
       });
@@ -80,7 +85,7 @@ export class StripeService {
   async constructWebhookEvent(payload: string, signature: string): Promise<Stripe.Event> {
     try {
       const webhookSecret = this.config.getStripeConfig().webhookSecret;
-      return await this.stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+      return await this.getStripe().webhooks.constructEvent(payload, signature, webhookSecret);
     } catch (error) {
       this.logger.error(`Failed to construct webhook event: ${error.message}`, error.stack);
       throw error;

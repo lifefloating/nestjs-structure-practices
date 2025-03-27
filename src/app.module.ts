@@ -17,6 +17,7 @@ import { StripeModule } from './stripe/stripe.module';
 
 @Module({
   imports: [
+    ConfigModule,
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       loaderOptions: {
@@ -30,7 +31,6 @@ import { StripeModule } from './stripe/stripe.module';
         AcceptLanguageResolver,
       ],
     }),
-    ConfigModule,
     PrismaModule,
     CommonModule,
     UsersModule,

@@ -12,6 +12,7 @@ import fastifyCors from '@fastify/cors';
 import fastifyMultipart from '@fastify/multipart';
 import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
 import { FastifyInstance } from 'fastify';
+import * as yaml from 'js-yaml';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -32,7 +33,9 @@ async function bootstrap() {
   const swaggerConfig = configService.getSwaggerConfig();
 
   app.setGlobalPrefix(apiPrefix as string, {
-    exclude: swaggerConfig?.path ? [swaggerConfig.path] : [],
+    exclude: swaggerConfig?.path
+      ? [swaggerConfig.path, 'openapi.json', 'openapi.yaml']
+      : ['openapi.json', 'openapi.yaml'],
   });
 
   app.enableVersioning({
@@ -88,7 +91,14 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup(swaggerConfig?.path || 'apidoc', app, document);
 
+    // Add YAML format OpenAPI document endpoint
+    fastifyInstance.get('/openapi.yaml', (_, reply) => {
+      reply.header('Content-Type', 'text/yaml');
+      reply.send(yaml.dump(document));
+    });
+
     logger.log(`Swagger documentation available at /${swaggerConfig?.path || 'apidoc'}`);
+    logger.log(`OpenAPI YAML available at /openapi.yaml`);
   }
 
   // Start the application
@@ -99,6 +109,8 @@ async function bootstrap() {
   if (swaggerConfig?.enabled) {
     const swaggerPath = swaggerConfig?.path || 'apidoc';
     logger.log(`Swagger API documentation available at: ${appUrl}/${swaggerPath}`);
+    logger.log(`OpenAPI JSON available at: ${appUrl}/openapi.json`);
+    logger.log(`OpenAPI YAML available at: ${appUrl}/openapi.yaml`);
   }
 }
 

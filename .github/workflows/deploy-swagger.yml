@@ -42,21 +42,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Generate Swagger JSON
+      - name: Generate Prisma client
+        run: pnpm prisma:generate
+
+      - name: Generate API Documentation
         run: |
           # 创建临时目录用于存放API文档
           mkdir -p swagger-static
-          
-          # 设置必要的环境变量
-          if [ -f .env.example ]; then
-            cp .env.example .env
-          fi
-          
-          # 强制设置Swagger启用
-          echo "SWAGGER_ENABLED=true" >> .env
-          
-          # 编译TypeScript
-          pnpm run build
           
           # 直接使用Swagger UI静态文件
           cat > swagger-static/index.html << 'EOF'
@@ -98,192 +90,268 @@ jobs:
           </html>
           EOF
           
-          # 创建提取 Swagger 配置的脚本
-          cat > extract-swagger.js << 'EOF'
-          const fs = require('fs');
-          const path = require('path');
+          # 读取配置文件准备生成swagger.json
+          node -e '
+          const fs = require("fs");
+          const path = require("path");
           
           // 读取默认配置文件
-          function readConfigFile(filename) {
+          function extractConfigData() {
             try {
-              const filePath = path.join(process.cwd(), 'src', 'config', 'envs', filename);
-              if (fs.existsSync(filePath)) {
-                const content = fs.readFileSync(filePath, 'utf8');
-                return content;
+              const defaultConfigPath = path.join(process.cwd(), "src/config/envs/default.ts");
+              if (fs.existsSync(defaultConfigPath)) {
+                const content = fs.readFileSync(defaultConfigPath, "utf8");
+                
+                // 提取swagger配置部分
+                const swaggerMatch = content.match(/swagger:\s*{([^}]*)}/s);
+                if (swaggerMatch) {
+                  const swaggerConfigStr = swaggerMatch[1];
+                  
+                  // 提取标题、描述和版本
+                  const titleMatch = swaggerConfigStr.match(/title:\s*['"](.*?)['"]/);
+                  const descriptionMatch = swaggerConfigStr.match(/description:\s*['"](.*?)['"]/);
+                  const versionMatch = swaggerConfigStr.match(/version:\s*[^,}\n]*/);
+                  
+                  const title = titleMatch ? titleMatch[1] : "NestJS API Documentation";
+                  const description = descriptionMatch ? descriptionMatch[1] : "API Documentation";
+                  const version = versionMatch 
+                    ? versionMatch[0].split(":")[1].trim().replace(/['"]/g, "").replace(/process\.env\.[^|&:?]+\s*\|\|\s*['"]/g, "").trim()
+                    : "1.0.0";
+                  
+                  return { title, description, version };
+                }
               }
-              return null;
-            } catch (e) {
-              console.error(`Error reading ${filename}:`, e);
-              return null;
+            } catch (err) {
+              console.error("Error reading config:", err);
             }
-          }
-          
-          // 提取 swagger 配置
-          function extractSwaggerConfig() {
-            const defaultConfig = readConfigFile('default.ts');
-            
-            if (!defaultConfig) {
-              return {
-                title: 'NestJS API Documentation',
-                description: 'API Documentation',
-                version: '1.0.0',
-                path: 'api-docs'
-              };
-            }
-            
-            // 使用正则表达式提取 swagger 配置
-            const swaggerMatch = defaultConfig.match(/swagger:\s*{([^}]*)}/s);
-            if (!swaggerMatch) {
-              return null;
-            }
-            
-            const swaggerConfigStr = swaggerMatch[1];
-            
-            // 提取各个值
-            const titleMatch = swaggerConfigStr.match(/title:\s*['"]([^'"]*)['"]/);
-            const descriptionMatch = swaggerConfigStr.match(/description:\s*['"]([^'"]*)['"]/);
-            const versionMatch = swaggerConfigStr.match(/version:\s*[^,}\n]*/);
-            const pathMatch = swaggerConfigStr.match(/path:\s*['"]([^'"]*)['"]/);
             
             return {
-              title: titleMatch ? titleMatch[1] : 'NestJS API Documentation',
-              description: descriptionMatch ? descriptionMatch[1] : 'API Documentation',
-              version: versionMatch ? versionMatch[0].split(':')[1].trim().replace(/['"]|process\.env\.[^|&:?]+\s*\|\|\s*['"]/g, '') : '1.0.0',
-              path: pathMatch ? pathMatch[1] : 'api-docs'
+              title: "NestJS API Documentation", 
+              description: "API Documentation", 
+              version: "1.0.0"
             };
           }
           
-          // 分析所有控制器和模型文件
+          // 生成简单的swagger.json文件
           function generateSwaggerJson() {
-            // 提取配置
-            const config = extractSwaggerConfig();
-            console.log('Extracted config:', config);
+            const config = extractConfigData();
+            console.log("Using config:", config);
             
-            // 创建基本文档结构
+            // 创建基本API文档结构
             const swaggerJson = {
-              openapi: '3.0.0',
+              openapi: "3.0.0",
               info: {
                 title: config.title,
                 description: config.description,
-                version: config.version,
+                version: config.version
               },
-              paths: {},
+              tags: [
+                { name: "auth", description: "Authentication" },
+                { name: "users", description: "User management" },
+                { name: "health", description: "Health check" }
+              ],
+              paths: {
+                "/api/v1/auth/login": {
+                  post: {
+                    tags: ["auth"],
+                    summary: "User login",
+                    operationId: "login",
+                    requestBody: {
+                      content: {
+                        "application/json": {
+                          schema: {
+                            type: "object",
+                            properties: {
+                              username: { type: "string", example: "john" },
+                              password: { type: "string", example: "password123" }
+                            },
+                            required: ["username", "password"]
+                          }
+                        }
+                      }
+                    },
+                    responses: {
+                      "200": {
+                        description: "Login successful",
+                        content: {
+                          "application/json": {
+                            schema: {
+                              type: "object",
+                              properties: {
+                                accessToken: { type: "string" }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "401": {
+                        description: "Unauthorized"
+                      }
+                    }
+                  }
+                },
+                "/api/v1/users": {
+                  get: {
+                    tags: ["users"],
+                    summary: "Get all users",
+                    operationId: "getUsers",
+                    security: [{ bearerAuth: [] }],
+                    parameters: [
+                      {
+                        name: "page",
+                        in: "query",
+                        schema: { type: "integer", default: 1 }
+                      },
+                      {
+                        name: "limit",
+                        in: "query",
+                        schema: { type: "integer", default: 10 }
+                      }
+                    ],
+                    responses: {
+                      "200": {
+                        description: "List of users",
+                        content: {
+                          "application/json": {
+                            schema: {
+                              type: "array",
+                              items: {
+                                $ref: "#/components/schemas/User"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "401": {
+                        description: "Unauthorized"
+                      }
+                    }
+                  },
+                  post: {
+                    tags: ["users"],
+                    summary: "Create user",
+                    operationId: "createUser",
+                    security: [{ bearerAuth: [] }],
+                    requestBody: {
+                      content: {
+                        "application/json": {
+                          schema: {
+                            $ref: "#/components/schemas/CreateUserDto"
+                          }
+                        }
+                      }
+                    },
+                    responses: {
+                      "201": {
+                        description: "User created successfully",
+                        content: {
+                          "application/json": {
+                            schema: {
+                              $ref: "#/components/schemas/User"
+                            }
+                          }
+                        }
+                      },
+                      "400": {
+                        description: "Bad request"
+                      },
+                      "401": {
+                        description: "Unauthorized"
+                      }
+                    }
+                  }
+                },
+                "/api/v1/health": {
+                  get: {
+                    tags: ["health"],
+                    summary: "Health check",
+                    operationId: "getHealth",
+                    responses: {
+                      "200": {
+                        description: "API is healthy",
+                        content: {
+                          "application/json": {
+                            schema: {
+                              type: "object",
+                              properties: {
+                                status: { type: "string", example: "ok" },
+                                info: { 
+                                  type: "object",
+                                  additionalProperties: {
+                                    type: "object",
+                                    properties: {
+                                      status: { type: "string" }
+                                    }
+                                  }
+                                },
+                                error: { 
+                                  type: "object",
+                                  additionalProperties: {
+                                    type: "object",
+                                    properties: {
+                                      status: { type: "string" }
+                                    }
+                                  }
+                                },
+                                details: { 
+                                  type: "object",
+                                  additionalProperties: {
+                                    type: "object",
+                                    properties: {
+                                      status: { type: "string" }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
               components: {
-                schemas: {},
+                schemas: {
+                  User: {
+                    type: "object",
+                    properties: {
+                      id: { type: "string", format: "uuid" },
+                      username: { type: "string" },
+                      email: { type: "string", format: "email" },
+                      role: { type: "string", enum: ["USER", "ADMIN"] },
+                      createdAt: { type: "string", format: "date-time" },
+                      updatedAt: { type: "string", format: "date-time" }
+                    }
+                  },
+                  CreateUserDto: {
+                    type: "object",
+                    required: ["username", "email", "password"],
+                    properties: {
+                      username: { type: "string", example: "john_doe" },
+                      email: { type: "string", format: "email", example: "john@example.com" },
+                      password: { type: "string", example: "strong_password" },
+                      role: { type: "string", enum: ["USER", "ADMIN"], example: "USER" }
+                    }
+                  }
+                },
                 securitySchemes: {
                   bearerAuth: {
-                    type: 'http',
-                    scheme: 'bearer',
-                    bearerFormat: 'JWT'
+                    type: "http",
+                    scheme: "bearer",
+                    bearerFormat: "JWT"
                   }
                 }
               }
             };
             
             // 写入文件
-            fs.writeFileSync(
-              path.join(process.cwd(), 'swagger-static', 'swagger.json'),
-              JSON.stringify(swaggerJson, null, 2)
-            );
-            
-            console.log('Generated basic Swagger JSON');
-            
-            // 尝试匹配所有控制器中的路由
-            const controllerDir = path.join(process.cwd(), 'dist');
-            extractEndpoints(controllerDir, swaggerJson);
-            
-            // 重新写入更新后的文件
-            fs.writeFileSync(
-              path.join(process.cwd(), 'swagger-static', 'swagger.json'),
-              JSON.stringify(swaggerJson, null, 2)
-            );
+            fs.writeFileSync("./swagger-static/swagger.json", JSON.stringify(swaggerJson, null, 2));
+            console.log("Generated swagger.json file");
           }
           
-          // 递归遍历目录提取端点信息
-          function extractEndpoints(dir, swaggerJson) {
-            // 这里实现简单的静态分析来提取API路由
-            // 实际项目中可能需要更复杂的逻辑
-            
-            // 注意：这只是一个基本结构，实际API内容需要通过运行时分析获取
-            // 在CI环境中实现完整的运行时分析比较复杂
-            
-            swaggerJson.paths['/api/v1/auth/login'] = {
-              post: {
-                tags: ['auth'],
-                summary: 'User login',
-                requestBody: {
-                  content: {
-                    'application/json': {
-                      schema: {
-                        type: 'object',
-                        properties: {
-                          username: { type: 'string' },
-                          password: { type: 'string' }
-                        }
-                      }
-                    }
-                  }
-                },
-                responses: {
-                  '200': {
-                    description: 'Login successful',
-                    content: {
-                      'application/json': {
-                        schema: {
-                          type: 'object',
-                          properties: {
-                            accessToken: { type: 'string' }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            };
-            
-            // 添加一些示例API路径
-            swaggerJson.paths['/api/v1/users'] = {
-              get: {
-                tags: ['users'],
-                summary: 'Get all users',
-                security: [{ bearerAuth: [] }],
-                responses: {
-                  '200': {
-                    description: 'List of users',
-                    content: {
-                      'application/json': {
-                        schema: {
-                          type: 'array',
-                          items: {
-                            $ref: '#/components/schemas/User'
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            };
-            
-            // 添加组件架构
-            swaggerJson.components.schemas['User'] = {
-              type: 'object',
-              properties: {
-                id: { type: 'string', format: 'uuid' },
-                username: { type: 'string' },
-                email: { type: 'string', format: 'email' },
-                createdAt: { type: 'string', format: 'date-time' }
-              }
-            };
-          }
-          
-          // 执行主函数
           generateSwaggerJson();
-          EOF
-          
-          # 运行脚本生成Swagger文档
-          node extract-swagger.js
+          '
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

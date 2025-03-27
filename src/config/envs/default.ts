@@ -14,6 +14,9 @@ export default {
       refreshSecret: process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key',
       refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '90d',
     },
+    betterAuth: {
+      allowed_origins: (process.env.ALLOWED_ORIGINS ?? '').split(', '),
+    },
   },
   cors: {
     enabled: true,
@@ -56,5 +59,10 @@ export default {
     publicKey: process.env.STRIPE_PUBLIC_KEY,
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
     apiVersion: process.env.STRIPE_API_VERSION || '2025-02-24.acacia',
+  },
+  oauth: {
+    providers: [],
+    secrets: {},
+    public: {},
   },
 };

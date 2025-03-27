@@ -28,10 +28,28 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.6.5
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
       
       - name: Install dependencies
-        run: npm install -g markdown-to-html-cli
+        run: pnpm install
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -121,7 +139,7 @@ jobs:
             echo "<li><a href='./${filename}.html'>$title</a></li>" >> ./_site/index.html
             
             # Convert markdown to HTML with style
-            markdown-to-html-cli "$file" -o "./_site/${filename}.html" --style-sheet './styles.css' --document-title "$title"
+            npx markdown-to-html-cli "$file" -o "./_site/${filename}.html" --style-sheet './styles.css' --document-title "$title"
             
             # Add navigation back to index
             sed -i '/<body>/a <div class="header"><a href="./index.html">← Back to Documentation Index</a></div>' "./_site/${filename}.html"

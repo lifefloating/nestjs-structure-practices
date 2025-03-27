@@ -7,6 +7,9 @@ export default {
     host: process.env.HOST || 'localhost',
     apiPrefix: process.env.API_PREFIX || 'api',
   },
+  database: {
+    url: process.env.DATABASE_URL || 'mongodb://localhost:27017/nestjs_practice',
+  },
   auth: {
     jwt: {
       secret: process.env.JWT_SECRET || 'your-secret-key',
@@ -27,6 +30,7 @@ export default {
     description: 'NestJS Project Template API documentation',
     version: process.env.API_DOC_VERSION || '1.0.0',
     path: 'apidoc',
+    openApiVersion: process.env.OPEN_API_VERSION || '3.1.0',
   },
   security: {
     helmet: true,

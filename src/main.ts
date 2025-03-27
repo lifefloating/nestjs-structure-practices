@@ -9,8 +9,6 @@ import { AppModule } from './app.module';
 import compression from '@fastify/compress';
 import helmet from '@fastify/helmet';
 import fastifyCors from '@fastify/cors';
-import fastifySwagger from '@fastify/swagger';
-import fastifySwaggerUi from '@fastify/swagger-ui';
 import fastifyMultipart from '@fastify/multipart';
 import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
 import { FastifyInstance } from 'fastify';
@@ -80,6 +78,7 @@ async function bootstrap() {
 
     // Generate Swagger OpenAPI document
     const options = new DocumentBuilder()
+      .setOpenAPIVersion(swaggerConfig?.openApiVersion || '3.1.0')
       .setTitle(swaggerConfig?.title || 'API Documentation')
       .setDescription(swaggerConfig?.description || 'API Documentation Description')
       .addBearerAuth()
@@ -87,19 +86,7 @@ async function bootstrap() {
       .build();
 
     const document = SwaggerModule.createDocument(app, options);
-
-    // Register Fastify Swagger
-    await fastifyInstance.register(fastifySwagger as any, {
-      mode: 'static',
-      specification: {
-        document: document as any,
-      },
-    });
-
-    // Register Swagger UI
-    await fastifyInstance.register(fastifySwaggerUi as any, {
-      routePrefix: swaggerConfig?.path || 'apidoc',
-    });
+    SwaggerModule.setup(swaggerConfig?.path || 'apidoc', app, document);
 
     logger.log(`Swagger documentation available at /${swaggerConfig?.path || 'apidoc'}`);
   }

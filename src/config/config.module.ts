@@ -14,6 +14,7 @@ const createSchemaForEnv = (isProd: boolean) => {
     PORT: Joi.number().default(7009),
     HOST: Joi.string().default('localhost'),
     API_PREFIX: Joi.string().default('api'),
+    OPEN_API_VERSION: Joi.string().default('3.1.0'),
     DATABASE_URL: Joi.string().required(),
     JWT_SECRET: Joi.string().required(),
     ALLOWED_ORIGINS: Joi.string().required(),

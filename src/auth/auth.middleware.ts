@@ -16,7 +16,7 @@ declare module 'http' {
 }
 
 export class AuthMiddleware implements NestMiddleware, OnModuleInit {
-  private authHandler: Awaited<ReturnType<typeof CreateAuth>>['handler'];
+  private authHandler: Awaited<ReturnType<typeof CreateAuth>>['handler'] | undefined;
 
   constructor(
     private readonly configService: ConfigService,
@@ -26,8 +26,7 @@ export class AuthMiddleware implements NestMiddleware, OnModuleInit {
 
   async onModuleInit() {
     const handler = async () => {
-      const oauth = await this.configService.get('oauth');
-
+      const oauth = await this.configService.getOAuthConfig();
       const providers = {} as NonNullable<BetterAuthOptions['socialProviders']>;
       oauth.providers.forEach((provider) => {
         if (!provider.enabled) return;
@@ -60,7 +59,6 @@ export class AuthMiddleware implements NestMiddleware, OnModuleInit {
           }
         }
       });
-
       const { handler, auth } = await CreateAuth(providers);
       this.authHandler = handler;
 

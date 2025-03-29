@@ -14,9 +14,11 @@ import { CommonModule } from './common/common.module';
 import { StorageModule } from './storage/storage.module';
 import { LoggerModule } from './logger/logger.module';
 import { StripeModule } from './stripe/stripe.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
+    ConfigModule,
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       loaderOptions: {
@@ -30,11 +32,11 @@ import { StripeModule } from './stripe/stripe.module';
         AcceptLanguageResolver,
       ],
     }),
-    ConfigModule,
     PrismaModule,
     CommonModule,
     UsersModule,
     StorageModule.register(),
+    AuthModule.forRoot(),
     LoggerModule,
     StripeModule,
   ],

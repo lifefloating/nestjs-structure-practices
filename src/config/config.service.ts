@@ -18,10 +18,12 @@ export class ConfigService {
     return this.get<Config['app']>('app');
   }
 
+  getOAuthConfig() {
+    return this.get<Config['oauth']>('oauth');
+  }
   getAuthConfig() {
     return this.get<Config['auth']>('auth');
   }
-
   getDatabaseConfig() {
     return this.get<Config['database']>('database');
   }

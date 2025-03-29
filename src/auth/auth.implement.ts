@@ -1,11 +1,16 @@
 import { IncomingMessage } from 'node:http';
 import { MongoClient } from 'mongodb';
-import type { BetterAuthOptions } from '../betterAuth';
 import type { ServerResponse } from 'node:http';
 
-import { APIError, betterAuth, mongodbAdapter, toNodeHandler } from '../betterAuth';
-
-import { AUTH_JS_ACCOUNT_COLLECTION, AUTH_JS_SESSION_COLLECTION } from './auth.constant';
+import {
+  AUTH_JS_ACCOUNT_COLLECTION,
+  AUTH_JS_SESSION_COLLECTION,
+  AUTH_JS_USER_COLLECTION,
+} from './auth.constant';
+import { APIError, betterAuth, BetterAuthOptions, BetterAuthPlugin } from 'better-auth';
+import { mongodbAdapter } from 'better-auth/adapters/mongodb';
+import { toNodeHandler } from 'better-auth/node';
+import { createAuthMiddleware } from 'better-auth/api';
 
 const { DATABASE_URL, API_VERSION, ALLOWED_ORIGINS, JWT_SECRET, NODE_ENV } = process.env;
 const client = new MongoClient(DATABASE_URL ?? '');
@@ -24,6 +29,66 @@ export function CreateAuth(providers: BetterAuthOptions['socialProviders']) {
       }
       return [...acc, `https://${origin}`, `http://${origin}`];
     }, []),
+    plugins: [
+      // @see https://gist.github.com/Bekacru/44cca7b3cf7dcdf1cee431a11d917b87
+      {
+        id: 'add-account-to-session',
+        hooks: {
+          after: [
+            {
+              matcher(context) {
+                return context.path.startsWith('/callback');
+              },
+              handler: createAuthMiddleware(async (ctx) => {
+                const provider = ctx.params?.id || ctx.path.split('/callback')[1];
+                if (!provider) {
+                  return;
+                }
+
+                let finalSessionId = '';
+                const sessionCookie = ctx.getHeader(ctx.context.authCookies.sessionToken.name);
+
+                if (sessionCookie) {
+                  const sessionId = sessionCookie.split('.')[0];
+                  if (sessionId) {
+                    finalSessionId = sessionId;
+                  }
+                }
+
+                if (!finalSessionId) {
+                  const setSessionToken = ctx.getHeader('set-cookie');
+
+                  if (setSessionToken) {
+                    const sessionId = setSessionToken.split(';')[0].split('=')[1].split('.')[0];
+
+                    if (sessionId) {
+                      finalSessionId = sessionId;
+                    }
+                  }
+                }
+
+                await db.collection(AUTH_JS_SESSION_COLLECTION).updateOne(
+                  {
+                    token: finalSessionId,
+                  },
+                  { $set: { provider } },
+                );
+              }),
+            },
+          ],
+        },
+        schema: {
+          session: {
+            fields: {
+              provider: {
+                type: 'string',
+                required: false,
+              },
+            },
+          },
+        },
+      } satisfies BetterAuthPlugin,
+    ],
     account: {
       modelName: AUTH_JS_ACCOUNT_COLLECTION,
       accountLinking: {
@@ -37,7 +102,7 @@ export function CreateAuth(providers: BetterAuthOptions['socialProviders']) {
     appName: 'nestjs-project-template',
     secret: JWT_SECRET,
     user: {
-      modelName: '',
+      modelName: AUTH_JS_USER_COLLECTION,
       additionalFields: {
         isOwner: {
           type: 'boolean',
@@ -78,7 +143,7 @@ export function CreateAuth(providers: BetterAuthOptions['socialProviders']) {
     } catch (error) {
       console.error(error);
       // throw error
-      res.end(error.message);
+      res.end((error as any).message);
     }
   };
 

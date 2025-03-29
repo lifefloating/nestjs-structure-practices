@@ -24,7 +24,7 @@ services:
 
   mongodb:
     container_name: mongodb
-    image: mongo:7.0
+    image: mongo:8.0
     restart: always
     environment:
       - MONGODB_DATABASE=nestjs_practice

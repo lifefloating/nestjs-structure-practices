@@ -29,6 +29,7 @@ export interface SwaggerConfig {
   description: string;
   version: string;
   path: string;
+  openApiVersion: string;
 }
 
 export interface SecurityConfig {

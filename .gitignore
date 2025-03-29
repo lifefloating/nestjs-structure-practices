@@ -35,3 +35,7 @@ prisma/migrations/
 .clinic
 .cache
 .npmrc
+
+#openapi
+openapi/*.yaml
+openapi/*.json

@@ -9,11 +9,10 @@ import { AppModule } from './app.module';
 import compression from '@fastify/compress';
 import helmet from '@fastify/helmet';
 import fastifyCors from '@fastify/cors';
-import fastifySwagger from '@fastify/swagger';
-import fastifySwaggerUi from '@fastify/swagger-ui';
 import fastifyMultipart from '@fastify/multipart';
 import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
 import { FastifyInstance } from 'fastify';
+import * as yaml from 'js-yaml';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -34,7 +33,9 @@ async function bootstrap() {
   const swaggerConfig = configService.getSwaggerConfig();
 
   app.setGlobalPrefix(apiPrefix as string, {
-    exclude: swaggerConfig?.path ? [swaggerConfig.path] : [],
+    exclude: swaggerConfig?.path
+      ? [swaggerConfig.path, 'openapi.json', 'openapi.yaml']
+      : ['openapi.json', 'openapi.yaml'],
   });
 
   app.enableVersioning({
@@ -80,6 +81,7 @@ async function bootstrap() {
 
     // Generate Swagger OpenAPI document
     const options = new DocumentBuilder()
+      .setOpenAPIVersion(swaggerConfig?.openApiVersion || '3.1.0')
       .setTitle(swaggerConfig?.title || 'API Documentation')
       .setDescription(swaggerConfig?.description || 'API Documentation Description')
       .addBearerAuth()
@@ -87,21 +89,16 @@ async function bootstrap() {
       .build();
 
     const document = SwaggerModule.createDocument(app, options);
+    SwaggerModule.setup(swaggerConfig?.path || 'apidoc', app, document);
 
-    // Register Fastify Swagger
-    await fastifyInstance.register(fastifySwagger as any, {
-      mode: 'static',
-      specification: {
-        document: document as any,
-      },
-    });
-
-    // Register Swagger UI
-    await fastifyInstance.register(fastifySwaggerUi as any, {
-      routePrefix: swaggerConfig?.path || 'apidoc',
+    // Add YAML format OpenAPI document endpoint
+    fastifyInstance.get('/openapi.yaml', (_, reply) => {
+      reply.header('Content-Type', 'text/yaml');
+      reply.send(yaml.dump(document));
     });
 
     logger.log(`Swagger documentation available at /${swaggerConfig?.path || 'apidoc'}`);
+    logger.log(`OpenAPI YAML available at /openapi.yaml`);
   }
 
   // Start the application
@@ -112,6 +109,8 @@ async function bootstrap() {
   if (swaggerConfig?.enabled) {
     const swaggerPath = swaggerConfig?.path || 'apidoc';
     logger.log(`Swagger API documentation available at: ${appUrl}/${swaggerPath}`);
+    logger.log(`OpenAPI JSON available at: ${appUrl}/openapi.json`);
+    logger.log(`OpenAPI YAML available at: ${appUrl}/openapi.yaml`);
   }
 }
 

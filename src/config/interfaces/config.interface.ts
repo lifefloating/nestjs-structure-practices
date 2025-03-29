@@ -71,6 +71,16 @@ export interface DatdogConfig {
   serviceName?: string;
   intakeRegion: string;
 }
+
+export interface OAuthConfig {
+  providers: Array<{
+    type: string;
+    enabled: boolean;
+  }>;
+  secrets: Record<string, Record<string, string>>;
+  public: Record<string, Record<string, string>>;
+}
+
 export interface Config {
   app: AppConfig;
   auth: AuthConfig;
@@ -81,4 +91,5 @@ export interface Config {
   storage: StorageConfig;
   datadog: DatdogConfig;
   stripe: StripeConfig;
+  oauth: OAuthConfig;
 }

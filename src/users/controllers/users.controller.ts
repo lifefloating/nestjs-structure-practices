@@ -23,7 +23,7 @@ export class UsersController {
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'Return all users' })
-  async findAll() {
+  findAll() {
     this.logger.log('Finding all users');
     return this.usersService.findAll();
   }

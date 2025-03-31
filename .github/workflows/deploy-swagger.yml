@@ -31,6 +31,7 @@ jobs:
       DATABASE_URL: ${{ secrets.DATABASE_URL || 'mongodb://localhost:27017/nestjs_practice' }}
       
       # Auth
+      ALLOWED_ORIGINS: ${{ vars.ALLOWED_ORIGINS || 'localhost:*,127.0.0.1,localhost:7009,*:7009' }}
       JWT_SECRET: ${{ secrets.JWT_SECRET || 'dummy-jwt-secret-for-swagger-generation' }}
       JWT_EXPIRES_IN: ${{ vars.JWT_EXPIRES_IN || '30d' }}
       JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET || 'dummy-jwt-refresh-secret-for-swagger-generation' }}

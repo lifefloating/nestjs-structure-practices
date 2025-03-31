@@ -10,7 +10,7 @@ export class UsersService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll() {
+  findAll() {
     this.logger.debug('Finding all users');
     return this.prisma.user.findMany({
       select: {

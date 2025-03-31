@@ -17,6 +17,7 @@ const createSchemaForEnv = (isProd: boolean) => {
     OPEN_API_VERSION: Joi.string().default('3.1.0'),
     DATABASE_URL: Joi.string().required(),
     JWT_SECRET: Joi.string().required(),
+    ALLOWED_ORIGINS: Joi.string().required(),
     JWT_EXPIRES_IN: Joi.string().default('30d'),
     JWT_REFRESH_SECRET: Joi.string().required(),
     JWT_REFRESH_EXPIRES_IN: Joi.string().default('90d'),
@@ -36,11 +37,12 @@ const createSchemaForEnv = (isProd: boolean) => {
     STRIPE_WEBHOOK_SECRET: Joi.string().required(),
     STRIPE_API_VERSION: Joi.string().required(),
   };
-
+  const betterAuthSchema = {};
   // Datadog schema varies by environment
   if (isProd) {
     return Joi.object({
       ...baseSchema,
+      ...betterAuthSchema,
       DATADOG_API_KEY: Joi.string().required(),
       DATADOG_SERVICE_NAME: Joi.string().required(),
       DATADOG_HOST_NAME: Joi.string().required(),
@@ -49,6 +51,7 @@ const createSchemaForEnv = (isProd: boolean) => {
   } else {
     return Joi.object({
       ...baseSchema,
+      ...betterAuthSchema,
       DATADOG_API_KEY: Joi.string().optional().default('dummy-api-key'),
       DATADOG_SERVICE_NAME: Joi.string().optional().default('my-service'),
       DATADOG_HOST_NAME: Joi.string().optional().default('host-name'),

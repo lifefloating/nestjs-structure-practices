@@ -1,5 +1,54 @@
 openapi: 3.1.0
 paths:
+  /api/v1/better-auth/token:
+    get:
+      operationId: AuthController_getOrVerifyToken_v1
+      parameters:
+        - name: token
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: id
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: &ref_0
+        - Auth
+    post:
+      operationId: AuthController_generateToken_v1
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags: *ref_0
+    delete:
+      operationId: AuthController_deleteToken_v1
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_0
+  /api/v1/better-auth/session:
+    get:
+      operationId: AuthController_getSession_v1
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_0
+  /api/v1/better-auth/providers:
+    get:
+      operationId: AuthController_getProviders_v1
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_0
   /api/v1/users:
     post:
       operationId: UsersController_create_v1
@@ -18,7 +67,7 @@ paths:
         '409':
           description: User already exists
       summary: Create a new user
-      tags: &ref_0
+      tags: &ref_1
         - users
     get:
       operationId: UsersController_findAll_v1
@@ -27,7 +76,7 @@ paths:
         '200':
           description: Return all users
       summary: Get all users
-      tags: *ref_0
+      tags: *ref_1
   /api/v1/users/{id}:
     get:
       operationId: UsersController_findOne_v1
@@ -44,7 +93,7 @@ paths:
         '404':
           description: User not found
       summary: Get a user by ID
-      tags: *ref_0
+      tags: *ref_1
   /api/v1/storage/upload:
     post:
       operationId: StorageController_uploadFile_v1
@@ -64,7 +113,7 @@ paths:
         '201':
           description: ''
       summary: Upload a single file
-      tags: &ref_1
+      tags: &ref_2
         - storage
   /api/v1/storage/{key}:
     delete:
@@ -80,7 +129,7 @@ paths:
         '200':
           description: ''
       summary: Delete a file
-      tags: *ref_1
+      tags: *ref_2
   /api/v1/storage/{key}/url:
     get:
       operationId: StorageController_getFileUrl_v1
@@ -101,7 +150,7 @@ paths:
         '200':
           description: ''
       summary: Get a signed URL for a file
-      tags: *ref_1
+      tags: *ref_2
   /api/v1/stripe/test:
     get:
       operationId: StripeController_test_v1
@@ -110,7 +159,7 @@ paths:
         '200':
           description: Stripe integration is working
       summary: Test Stripe integration
-      tags: &ref_2
+      tags: &ref_3
         - stripe
   /api/v1/stripe/payment-intents:
     post:
@@ -128,7 +177,7 @@ paths:
         '400':
           description: Bad request
       summary: Create a payment intent
-      tags: *ref_2
+      tags: *ref_3
   /api/v1/stripe/payment-intents/{id}:
     get:
       operationId: StripeController_retrievePaymentIntent_v1
@@ -145,7 +194,7 @@ paths:
         '404':
           description: Payment intent not found
       summary: Retrieve a payment intent
-      tags: *ref_2
+      tags: *ref_3
   /api/v1/stripe/customers:
     post:
       operationId: StripeController_createCustomer_v1
@@ -162,7 +211,7 @@ paths:
         '400':
           description: Bad request
       summary: Create a customer
-      tags: *ref_2
+      tags: *ref_3
   /api/v1/stripe/setup-intents:
     post:
       operationId: StripeController_createSetupIntent_v1
@@ -173,7 +222,7 @@ paths:
         '400':
           description: Bad request
       summary: Create a setup intent for a customer
-      tags: *ref_2
+      tags: *ref_3
   /api/v1/stripe/webhooks:
     post:
       operationId: StripeController_handleWebhook_v1
@@ -190,7 +239,7 @@ paths:
         '400':
           description: Invalid webhook signature
       summary: Handle Stripe webhook events
-      tags: *ref_2
+      tags: *ref_3
 info:
   title: NestJS Project Template API
   description: NestJS Project Template API documentation

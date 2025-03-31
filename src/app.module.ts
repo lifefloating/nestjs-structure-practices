@@ -19,6 +19,7 @@ import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     ConfigModule,
+    AuthModule.forRoot(),
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       loaderOptions: {
@@ -36,7 +37,6 @@ import { AuthModule } from './auth/auth.module';
     CommonModule,
     UsersModule,
     StorageModule.register(),
-    AuthModule.forRoot(),
     LoggerModule,
     StripeModule,
   ],

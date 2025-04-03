@@ -134,7 +134,7 @@ export default {
 - [Discord](https://discord.com/developers/applications)
 - [Apple](https://developer.apple.com/)
 
-## 使用
+## 使用方法
 
 启动登录流程:
 

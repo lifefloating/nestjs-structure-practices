@@ -24,5 +24,14 @@ export enum OAuthProviderType {
 }
 
 // Auth middleware configuration
-export const AUTH_BYPASS_PATHS = ['/token', '/session', '/providers'];
-export const AUTH_ALLOWED_METHODS = ['GET', 'POST'];
+// Paths relative to the basePath that should bypass authentication
+export const AUTH_BYPASS_PATHS = [
+  '/better-auth/token',
+  '/better-auth/session',
+  '/better-auth/providers',
+  '/healthcheck',
+  '/apidoc',
+  '/openapi.yaml',
+  '/openapi.json',
+];
+export const AUTH_ALLOWED_METHODS = ['GET', 'POST', 'OPTIONS'];

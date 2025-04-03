@@ -12,6 +12,7 @@ import {
 import { CreateAuth } from './auth.implement';
 import { InjectAuthInstance } from './auth.interface';
 import { ConfigService } from '@app/config/config.service';
+import { PrismaService } from '@app/prisma/prisma.service';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware, OnModuleInit {
@@ -20,6 +21,7 @@ export class AuthMiddleware implements NestMiddleware, OnModuleInit {
 
   constructor(
     private readonly configService: ConfigService,
+    private readonly prismaService: PrismaService,
     @Inject(AuthInstanceInjectKey)
     private readonly authInstance: InjectAuthInstance,
   ) {}
@@ -58,7 +60,7 @@ export class AuthMiddleware implements NestMiddleware, OnModuleInit {
         } as any; // Using any to bypass complex type intersection
       }
 
-      const { handler, auth } = await CreateAuth(providers);
+      const { handler, auth } = await CreateAuth(providers, this.prismaService, this.configService);
       this.authHandler = handler;
       this.authInstance.set(auth);
     } catch (error) {
@@ -102,6 +104,12 @@ export class AuthMiddleware implements NestMiddleware, OnModuleInit {
     // Call the better-auth handler and handle promise errors
     this.authHandler(req, res).catch((error) => {
       this.logger.error(`Auth handler error: ${error.message}`, error.stack);
+      // throw it to trigger NestJS exception filters
+      req.authError = error;
+      if (error.critical) {
+        throw error;
+      }
+
       next();
     });
   }

@@ -77,9 +77,13 @@ export interface OAuthConfig {
     type: string;
     enabled: boolean;
   }>;
+  baseConfig: {
+    callbackUrl: string;
+    cookieName: string;
+    cookieMaxAge: number;
+    cookieSecure: boolean;
+  };
   secrets: Record<string, Record<string, string>>;
-  public: Record<string, Record<string, string>>;
-  defaults?: Record<string, Record<string, string>>;
 }
 
 export interface Config {

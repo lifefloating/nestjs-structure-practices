@@ -35,7 +35,7 @@ export function CreateAuth(providers: BetterAuthOptions['socialProviders']) {
       return [...acc, `https://${origin}`, `http://${origin}`];
     }, []),
     plugins: [
-      // @see https://gist.github.com/Bekacru/44cca7b3cf7dcdf1cee431a11d917b87
+      // Session provider tracking plugin
       {
         id: 'add-account-to-session',
         hooks: {

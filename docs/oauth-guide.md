@@ -68,8 +68,16 @@ sequenceDiagram
 确保在环境中设置了核心 OAuth 配置：
 
 ```env
-JWT_SECRET=your-secret-key
-ALLOWED_ORIGINS=http://localhost:3000,https://yourdomain.com
+# OAuth 核心配置
+OAUTH_PROVIDERS=github,google
+OAUTH_CALLBACK_URL_BASE=http://localhost:7009/api/v1/auth/callback
+OAUTH_COOKIE_NAME=auth_session
+OAUTH_COOKIE_MAX_AGE=2592000
+OAUTH_COOKIE_SECURE=false
+
+# 提供商凭据
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
 ```
 
 ### 提供商配置
@@ -79,23 +87,30 @@ ALLOWED_ORIGINS=http://localhost:3000,https://yourdomain.com
 ```typescript
 export default {
   oauth: {
+    // 从环境变量读取启用的提供商列表（逗号分隔）
     providers: [
-      { type: 'github', enabled: true },
-      { type: 'google', enabled: true },
-      // 添加其他提供商
+      ...(process.env.OAUTH_PROVIDERS || 'github')
+        .split(',')
+        .map(type => ({
+          type: type.trim(),
+          enabled: true,
+        })),
     ],
+    // OAuth 核心设置
+    baseConfig: {
+      callbackUrl: process.env.OAUTH_CALLBACK_URL_BASE || 'http://localhost:7009/api/v1/auth/callback',
+      cookieName: process.env.OAUTH_COOKIE_NAME || 'auth_session',
+      cookieMaxAge: parseInt(process.env.OAUTH_COOKIE_MAX_AGE || '2592000', 10), // 30 天
+      cookieSecure: process.env.OAUTH_COOKIE_SECURE === 'true',
+    },
+    // 提供商配置
     secrets: {
       github: {
-        clientId: process.env.GITHUB_CLIENT_ID,
-        clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        clientId: process.env.GITHUB_CLIENT_ID || '',
+        clientSecret: process.env.GITHUB_CLIENT_SECRET || '',
       },
-      // 添加其他提供商配置
+      // 根据需要添加更多提供商 https://github.com/better-auth/better-auth
     },
-    defaults: {
-      microsoft: { tenantId: 'common' },
-      vk: { apiVersion: '5.131' },
-      tiktok: { scope: 'user.info.basic' },
-    }
   }
 };
 ```

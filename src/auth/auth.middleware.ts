@@ -33,24 +33,30 @@ export class AuthMiddleware implements NestMiddleware, OnModuleInit {
       const oauth = await this.configService.getOAuthConfig();
       const providers = {} as NonNullable<BetterAuthOptions['socialProviders']>;
 
-      oauth.providers.forEach((provider) => {
-        if (!provider.enabled) return;
+      // Get enabled providers
+      const enabledProviders = oauth.providers
+        .filter((provider) => provider.enabled)
+        .map((provider) => provider.type);
 
-        // Safely cast provider type string to enum
-        const providerType = this.getProviderType(provider.type);
-        if (!providerType) return;
+      // Process each enabled provider
+      for (const providerType of enabledProviders) {
+        // Validate provider type
+        const enumProviderType = this.getProviderType(providerType);
+        if (!enumProviderType) continue;
 
-        // Get default config for this provider type
-        const defaultConfig = oauth.defaults?.[provider.type] || {};
+        // Get provider config
+        const config = oauth.secrets[providerType];
+        if (!config || !config.clientId || !config.clientSecret) continue;
 
-        const mergedConfig = {
-          ...defaultConfig,
-          ...oauth.public[provider.type],
-          ...oauth.secrets[provider.type],
-        };
-
-        this.configureProvider(providers, providerType, mergedConfig);
-      });
+        // Add to providers with proper typecasting
+        providers[providerType as keyof typeof providers] = {
+          clientId: config.clientId,
+          clientSecret: config.clientSecret,
+          ...Object.entries(config)
+            .filter(([key]) => !['clientId', 'clientSecret'].includes(key))
+            .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {}),
+        } as any; // Using any to bypass complex type intersection
+      }
 
       const { handler, auth } = await CreateAuth(providers);
       this.authHandler = handler;
@@ -66,37 +72,6 @@ export class AuthMiddleware implements NestMiddleware, OnModuleInit {
     return Object.values(OAuthProviderType).includes(typeString as OAuthProviderType)
       ? (typeString as OAuthProviderType)
       : null;
-  }
-
-  private configureProvider(
-    providers: NonNullable<BetterAuthOptions['socialProviders']>,
-    providerType: OAuthProviderType,
-    config: Record<string, string>,
-  ) {
-    if (!config.clientId || !config.clientSecret) return;
-
-    // Base configuration for all providers
-    const baseProviderConfig = {
-      clientId: config.clientId,
-      clientSecret: config.clientSecret,
-    };
-
-    // Create final provider config from base config and any additional config values
-    const additionalConfig = Object.entries(config).reduce(
-      (acc, [key, value]) => {
-        if (key !== 'clientId' && key !== 'clientSecret') {
-          acc[key] = value;
-        }
-        return acc;
-      },
-      {} as Record<string, string>,
-    );
-
-    // Apply configuration with type safety
-    providers[providerType as keyof typeof providers] = {
-      ...baseProviderConfig,
-      ...additionalConfig,
-    };
   }
 
   // NestJS middleware interface method

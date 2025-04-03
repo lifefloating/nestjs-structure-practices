@@ -68,8 +68,16 @@ The application supports the following OAuth providers:
 Ensure you have the core OAuth settings in your environment:
 
 ```env
-JWT_SECRET=your-secret-key
-ALLOWED_ORIGINS=http://localhost:3000,https://yourdomain.com
+# Core OAuth configuration
+OAUTH_PROVIDERS=github,google
+OAUTH_CALLBACK_URL_BASE=http://localhost:7009/api/v1/auth/callback
+OAUTH_COOKIE_NAME=auth_session
+OAUTH_COOKIE_MAX_AGE=2592000
+OAUTH_COOKIE_SECURE=false
+
+# Provider credentials
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
 ```
 
 ### Provider Configuration
@@ -79,23 +87,30 @@ Update your configuration in `src/config/envs/default.ts`:
 ```typescript
 export default {
   oauth: {
+    // List of enabled providers from env var (comma separated)
     providers: [
-      { type: 'github', enabled: true },
-      { type: 'google', enabled: true },
-      // Add other providers as needed
+      ...(process.env.OAUTH_PROVIDERS || 'github')
+        .split(',')
+        .map(type => ({
+          type: type.trim(),
+          enabled: true,
+        })),
     ],
+    // Core OAuth settings
+    baseConfig: {
+      callbackUrl: process.env.OAUTH_CALLBACK_URL_BASE || 'http://localhost:7009/api/v1/auth/callback',
+      cookieName: process.env.OAUTH_COOKIE_NAME || 'auth_session',
+      cookieMaxAge: parseInt(process.env.OAUTH_COOKIE_MAX_AGE || '2592000', 10), // 30 days
+      cookieSecure: process.env.OAUTH_COOKIE_SECURE === 'true',
+    },
+    // Provider configurations
     secrets: {
       github: {
-        clientId: process.env.GITHUB_CLIENT_ID,
-        clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        clientId: process.env.GITHUB_CLIENT_ID || '',
+        clientSecret: process.env.GITHUB_CLIENT_SECRET || '',
       },
-      // Add configuration for other providers
+      // Add more providers as needed https://github.com/better-auth/better-auth
     },
-    defaults: {
-      microsoft: { tenantId: 'common' },
-      vk: { apiVersion: '5.131' },
-      tiktok: { scope: 'user.info.basic' },
-    }
   }
 };
 ```

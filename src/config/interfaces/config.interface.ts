@@ -79,6 +79,7 @@ export interface OAuthConfig {
   }>;
   secrets: Record<string, Record<string, string>>;
   public: Record<string, Record<string, string>>;
+  defaults?: Record<string, Record<string, string>>;
 }
 
 export interface Config {

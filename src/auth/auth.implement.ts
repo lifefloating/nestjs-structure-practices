@@ -18,6 +18,11 @@ const client = new MongoClient(DATABASE_URL ?? '');
 const db = client.db();
 
 const isDev = NODE_ENV === 'development';
+
+// Type for the request object that can be either a native Node.js request or a Fastify request
+export type AuthRequest = IncomingMessage & { originalUrl?: string; url?: string };
+export type AuthResponse = ServerResponse;
+
 export function CreateAuth(providers: BetterAuthOptions['socialProviders']) {
   const auth = betterAuth({
     database: mongodbAdapter(db),
@@ -117,7 +122,7 @@ export function CreateAuth(providers: BetterAuthOptions['socialProviders']) {
     },
   });
 
-  const handler = async (req: IncomingMessage, res: ServerResponse) => {
+  const handler = async (req: AuthRequest, res: AuthResponse) => {
     try {
       res.setHeader('access-control-allow-methods', 'GET, POST');
       res.setHeader('access-control-allow-headers', 'content-type');
@@ -127,11 +132,17 @@ export function CreateAuth(providers: BetterAuthOptions['socialProviders']) {
       );
       res.setHeader('access-control-allow-credentials', 'true');
 
+      // Handle both Fastify and regular Node.js requests
+      const url = req.originalUrl || req.url;
+      if (!url) {
+        throw new Error('Request URL is missing');
+      }
+
       const clonedRequest = new IncomingMessage(req.socket);
       const handler = toNodeHandler(auth)(
         Object.assign(clonedRequest, req, {
-          url: req.originalUrl,
-
+          url,
+          originalUrl: url, // Ensure originalUrl is set for better-auth
           socket: Object.assign(req.socket, {
             encrypted: isDev ? false : true,
           }),

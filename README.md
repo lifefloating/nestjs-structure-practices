@@ -23,6 +23,7 @@
 
 - [Installation and Running Guide](./docs/install&run.md)
 - [Cloud Storage Integration Guide (Chinese)](./docs/storage-guide.md) | [English](./docs/storage-guide-en.md)
+- [OAuth Authentication Guide (Chinese)](./docs/oauth-guide.md) | [English](./docs/oauth-guide-en.md)
 
 ## commit Doc
 
@@ -50,7 +51,7 @@
 - Structured logging
 - API documentation with Swagger
 - Configuration management with validation
-- Authentication and authorization
+- Authentication and authorization with multiple OAuth providers (Google, GitHub, Facebook, Twitter, Microsoft, Discord, Apple)
 - Unit and e2e testing setup
 - Performance optimized with Fastify and SWC
 - Git hooks with Husky and [conventional commits](./COMMIT_CONVENTION.md)

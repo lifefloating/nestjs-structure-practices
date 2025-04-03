@@ -80,5 +80,16 @@ export default {
     public: {
       github: {},
     },
+    defaults: {
+      microsoft: {
+        tenantId: 'common',
+      },
+      vk: {
+        apiVersion: '5.131',
+      },
+      tiktok: {
+        scope: 'user.info.basic',
+      },
+    },
   },
 };

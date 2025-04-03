@@ -66,19 +66,31 @@ export default {
   },
   oauth: {
     providers: [
-      {
-        type: 'github',
+      ...(process.env.OAUTH_PROVIDERS || 'github').split(',').map((type) => ({
+        type: type.trim(),
         enabled: true,
-      },
+      })),
     ],
-    secrets: {
-      github: {
-        clientId: '*******',
-        clientSecret: '********',
-      },
+    // Core OAuth settings
+    baseConfig: {
+      callbackUrl:
+        process.env.OAUTH_CALLBACK_URL_BASE || 'http://localhost:7009/api/v1/auth/callback',
+      cookieName: process.env.OAUTH_COOKIE_NAME || 'auth_session',
+      cookieMaxAge: parseInt(process.env.OAUTH_COOKIE_MAX_AGE || '2592000', 10), // 30 days
+      cookieSecure: process.env.OAUTH_COOKIE_SECURE === 'true',
     },
-    public: {
-      github: {},
+    // Provider configurations
+    secrets: {
+      // Default demo example provider
+      github: {
+        clientId: process.env.GITHUB_CLIENT_ID || '',
+        clientSecret: process.env.GITHUB_CLIENT_SECRET || '',
+      },
+      apple: {
+        clientId: process.env.APPLE_CLIENT_ID || '',
+        clientSecret: process.env.APPLE_CLIENT_SECRET || '',
+      },
+      // more please refer to https://github.com/better-auth/better-auth
     },
   },
 };

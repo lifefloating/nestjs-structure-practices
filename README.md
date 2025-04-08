@@ -33,6 +33,7 @@
 - [Installation and Running Guide](./docs/install&run.md)
 - [Cloud Storage Integration Guide (Chinese)](./docs/storage-guide.md) | [English](./docs/storage-guide-en.md)
 - [OAuth Authentication Guide (Chinese)](./docs/oauth-guide.md) | [English](./docs/oauth-guide-en.md)
+- [Mailer Module Guide (Chinese)](./docs/mailer.md) |  [English](./docs/mailer-en.md)
 
 ## commit Doc
 

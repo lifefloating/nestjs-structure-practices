@@ -1,0 +1,26 @@
+{
+  "verification": {
+    "title": "邮箱验证",
+    "subject": "验证您的电子邮箱",
+    "greeting": "您好，",
+    "message": "感谢您的注册。请使用以下验证码完成注册：{verificationCode}",
+    "button": "验证邮箱",
+    "footer": "如果您没有请求此验证，请忽略此邮件。"
+  },
+  "welcome": {
+    "title": "欢迎加入Nestjs",
+    "subject": "欢迎加入Nestjs",
+    "greeting": "欢迎，{name}！",
+    "message": "感谢您加入Nestjs。我们很高兴有您的加入！",
+    "button": "开始使用",
+    "footer": "如果您有任何问题，请随时联系我们的支持团队。"
+  },
+  "forgot-password": {
+    "title": "重置密码",
+    "subject": "重置您的密码",
+    "greeting": "您好，",
+    "message": "我们收到了重置密码的请求。点击下面的按钮创建新密码。此链接将在 {expireTime} 分钟后过期。",
+    "button": "重置密码",
+    "footer": "如果您没有请求重置密码，请忽略此邮件，如有疑虑请联系支持团队。"
+  }
+} 

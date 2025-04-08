@@ -15,6 +15,7 @@ import { StorageModule } from './storage/storage.module';
 import { LoggerModule } from './logger/logger.module';
 import { StripeModule } from './stripe/stripe.module';
 import { AuthModule } from './auth/auth.module';
+import { MailerModule } from './mailer/mailer.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { AuthModule } from './auth/auth.module';
     StorageModule.register(),
     LoggerModule,
     StripeModule,
+    MailerModule,
   ],
   controllers: [],
   providers: [],

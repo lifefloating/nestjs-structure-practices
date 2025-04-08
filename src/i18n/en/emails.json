@@ -1,0 +1,26 @@
+{
+  "verification": {
+    "title": "Email Verification",
+    "subject": "Verify Your Email Address",
+    "greeting": "Hello,",
+    "message": "Thank you for signing up. Please use the following verification code to complete your registration: {verificationCode}",
+    "button": "Verify Email",
+    "footer": "If you did not request this verification, please ignore this email."
+  },
+  "welcome": {
+    "title": "Welcome to Nestjs",
+    "subject": "Welcome to Nestjs",
+    "greeting": "Welcome, {name}!",
+    "message": "Thank you for joining Nestjs. We're excited to have you on board!",
+    "button": "Get Started",
+    "footer": "If you have any questions, feel free to contact our support team."
+  },
+  "forgot-password": {
+    "title": "Reset Your Password",
+    "subject": "Reset Your Password",
+    "greeting": "Hello,",
+    "message": "We received a request to reset your password. Click the button below to create a new password. This link will expire in {expireTime} minutes.",
+    "button": "Reset Password",
+    "footer": "If you didn't request this password reset, please ignore this email or contact support if you have concerns."
+  }
+} 

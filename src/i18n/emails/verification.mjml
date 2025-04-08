@@ -1,0 +1,23 @@
+<mjml>
+  <mj-head>
+    <mj-title>{{ 'emails.verification.title' | translate }}</mj-title>
+  </mj-head>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="20px" color="#333">
+          {{ 'emails.verification.greeting' | translate }}
+        </mj-text>
+        <mj-text color="#555" font-size="16px">
+          {{ 'emails.verification.message' | translate }}
+        </mj-text>
+        <mj-button background-color="#4CAF50" color="white" href="{{verificationUrl}}">
+          {{ 'emails.verification.button' | translate }}
+        </mj-button>
+        <mj-text color="#666" font-size="14px">
+          {{ 'emails.verification.footer' | translate }}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml> 

@@ -26,7 +26,11 @@ export class MailerService {
     });
   }
 
-  private async renderTemplate(templateName: string, context: Record<string, any>, lang: string = 'en'): Promise<string> {
+  private async renderTemplate(
+    templateName: string,
+    context: Record<string, any>,
+    lang: string = 'en',
+  ): Promise<string> {
     try {
       // Read MJML template
       const templatePath = path.join(__dirname, '..', 'i18n', 'emails', `${templateName}.mjml`);
@@ -34,10 +38,13 @@ export class MailerService {
 
       // Replace template variables with translations
       const translations = await this.getEmailTranslations(templateName, lang, context);
-      
+
       // Replace all the translation placeholders in the template
       Object.entries(translations).forEach(([key, value]) => {
-        const regex = new RegExp(`{\\{\\s*'emails\\.${templateName}\\.${key}'\\s*\\|\\s*translate(?::\\s*\\{.*?\\})?\\s*\\}\\}`, 'g');
+        const regex = new RegExp(
+          `{\\{\\s*'emails\\.${templateName}\\.${key}'\\s*\\|\\s*translate(?::\\s*\\{.*?\\})?\\s*\\}\\}`,
+          'g',
+        );
         mjmlTemplate = mjmlTemplate.replace(regex, value);
       });
 
@@ -57,17 +64,11 @@ export class MailerService {
   }
 
   private async getEmailTranslations(
-    templateName: string, 
+    templateName: string,
     lang: string,
-    context: Record<string, any>
+    context: Record<string, any>,
   ): Promise<Record<string, string>> {
-    const keys = [
-      'title',
-      'greeting',
-      'message',
-      'button',
-      'footer'
-    ];
+    const keys = ['title', 'greeting', 'message', 'button', 'footer'];
 
     const translations: Record<string, string> = {};
 
@@ -82,9 +83,9 @@ export class MailerService {
   }
 
   async sendVerificationEmail(
-    email: string, 
-    verificationCode: string, 
-    lang: string = 'en'
+    email: string,
+    verificationCode: string,
+    lang: string = 'en',
   ): Promise<void> {
     try {
       const context = {
@@ -94,7 +95,7 @@ export class MailerService {
       };
 
       const html = await this.renderTemplate('verification', context, lang);
-      
+
       const subject = await this.i18n.translate('emails.verification.subject', { lang });
 
       await this.transporter.sendMail({
@@ -111,11 +112,7 @@ export class MailerService {
     }
   }
 
-  async sendWelcomeEmail(
-    email: string, 
-    name: string, 
-    lang: string = 'en'
-  ): Promise<void> {
+  async sendWelcomeEmail(email: string, name: string, lang: string = 'en'): Promise<void> {
     try {
       const context = {
         name,
@@ -123,7 +120,7 @@ export class MailerService {
       };
 
       const html = await this.renderTemplate('welcome', context, lang);
-      
+
       const subject = await this.i18n.translate('emails.welcome.subject', { lang });
 
       await this.transporter.sendMail({
@@ -144,7 +141,7 @@ export class MailerService {
     email: string,
     resetToken: string,
     expireTime: number,
-    lang: string = 'en'
+    lang: string = 'en',
   ): Promise<void> {
     try {
       const context = {
@@ -154,7 +151,7 @@ export class MailerService {
       };
 
       const html = await this.renderTemplate('forgot-password', context, lang);
-      
+
       const subject = await this.i18n.translate('emails.forgot-password.subject', { lang });
 
       await this.transporter.sendMail({
@@ -170,4 +167,4 @@ export class MailerService {
       throw error;
     }
   }
-} 
+}
